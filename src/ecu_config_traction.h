@@ -1,0 +1,41 @@
+#ifndef ECU_CONFIG_TRACTION_H_
+#define ECU_CONFIG_TRACTION_H_
+
+
+#define USE_SRV_SYS_OS_SEQ
+#define USE_SRV_UI_SERIAL
+#define USE_DD_DC_MOTOR
+// #define USE_DD_JOYSTICK
+// #define USE_ED_BUZZER
+#define USE_ED_CAN_MCP
+// #define USE_ED_ESC
+// #define USE_ED_ENCODER
+#define USE_ED_L298
+#define USE_SRV_COM_CAN
+// #define USE_SRV_CONTROL
+// #define USE_SRV_UI_BT
+// #define USE_SRV_UI_LCD
+#define USE_CTRL_WHEEL_TRACT
+
+#define CTRL_WHEEL_TRACT_TARGET_MODE CTRL_WHEEL_TRACT_TARGET_MODE_CAN
+#define CTRL_WHEEL_TRACT_OP_MODE CTRL_WHEEL_TRACT_OP_MODE_POWER
+
+#ifndef ED_L298_IN_1_PIN_LIST
+#define ED_L298_IN_1_PIN_LIST {4, 7}
+#endif
+#ifndef ED_L298_IN_2_PIN_LIST
+#define ED_L298_IN_2_PIN_LIST {5, 8}
+#endif
+#ifndef ED_L298_EN_PIN_LIST
+#define ED_L298_EN_PIN_LIST {6, 9}
+#endif
+
+
+
+#define TX_CAN_ID_NR_OF 0
+#define TX_CAN_ID_LIST {}
+#define RX_CAN_ID_NR_OF 1
+#define RX_CAN_ID_LIST {CAN_ID_UI_BT_CHASSIS}
+
+
+#endif

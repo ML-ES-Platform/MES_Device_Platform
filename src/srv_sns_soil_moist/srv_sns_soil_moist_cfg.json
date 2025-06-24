@@ -1,0 +1,24 @@
+{
+    "components": {
+        "srv_sns_soil_moist": {
+            "type": "Sensor",
+            "description": "Soil Moisture Sensor",
+            "config": {
+                "pin": "A0"
+            },
+            "meta": {
+                "author": "SmartGrow"
+            },
+            "signals": {
+                "moisture": {
+                    "signal_name": "moisture",
+                    "units": "%",
+                    "signal_dir": "output",
+                    "default_value": "0.0",
+                    "dependency": "ed_sns_soil_moist"
+                }
+            },
+            "features": []
+        }
+    }
+}

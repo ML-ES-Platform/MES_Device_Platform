@@ -1,0 +1,85 @@
+//
+// !!! WARNING !!! AUTO-GENERATED FILE!
+// PLEASE DO NOT MODIFY IT AND USE "platformio.ini":
+// https://docs.platformio.org/page/projectconf/section_env_build.html#build-flags
+//
+{
+    "configurations": [
+        {
+            "name": "PlatformIO",
+            "includePath": [
+                "C:/Users/andre/OneDrive - Technical University of Moldova/Projects/MES_Device_Platform/include",
+                "C:/Users/andre/OneDrive - Technical University of Moldova/Projects/MES_Device_Platform/src",
+                "C:/Users/andre/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
+                "C:/Users/andre/OneDrive - Technical University of Moldova/Projects/MES_Device_Platform/.pio/libdeps/nanoatmega328/Adafruit PWM Servo Driver Library",
+                "C:/Users/andre/OneDrive - Technical University of Moldova/Projects/MES_Device_Platform/.pio/libdeps/nanoatmega328/WiFiEsp/src",
+                "C:/Users/andre/OneDrive - Technical University of Moldova/Projects/MES_Device_Platform/.pio/libdeps/nanoatmega328/PubSubClient/src",
+                "C:/Users/andre/OneDrive - Technical University of Moldova/Projects/MES_Device_Platform/.pio/libdeps/nanoatmega328/TimerOne",
+                "C:/Users/andre/OneDrive - Technical University of Moldova/Projects/MES_Device_Platform/.pio/libdeps/nanoatmega328/FreeRTOS/src",
+                "C:/Users/andre/OneDrive - Technical University of Moldova/Projects/MES_Device_Platform/.pio/libdeps/nanoatmega328/Servo/src",
+                "C:/Users/andre/OneDrive - Technical University of Moldova/Projects/MES_Device_Platform/.pio/libdeps/nanoatmega328/LiquidCrystal_I2C",
+                "C:/Users/andre/OneDrive - Technical University of Moldova/Projects/MES_Device_Platform/.pio/libdeps/nanoatmega328/mcp_can",
+                "C:/Users/andre/OneDrive - Technical University of Moldova/Projects/MES_Device_Platform/.pio/libdeps/nanoatmega328/ArduinoJson/src",
+                "C:/Users/andre/OneDrive - Technical University of Moldova/Projects/MES_Device_Platform/.pio/libdeps/nanoatmega328/BH1750/src",
+                "C:/Users/andre/OneDrive - Technical University of Moldova/Projects/MES_Device_Platform/.pio/libdeps/nanoatmega328/Adafruit BMP085 Library",
+                "C:/Users/andre/OneDrive - Technical University of Moldova/Projects/MES_Device_Platform/.pio/libdeps/nanoatmega328/Adafruit BusIO",
+                "C:/Users/andre/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
+                "C:/Users/andre/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
+                "C:/Users/andre/OneDrive - Technical University of Moldova/Projects/MES_Device_Platform/.pio/libdeps/nanoatmega328/DHT sensor library",
+                "C:/Users/andre/OneDrive - Technical University of Moldova/Projects/MES_Device_Platform/.pio/libdeps/nanoatmega328/Adafruit Unified Sensor",
+                "C:/Users/andre/.platformio/packages/framework-arduino-avr/cores/arduino",
+                "C:/Users/andre/.platformio/packages/framework-arduino-avr/variants/eightanaloginputs",
+                "C:/Users/andre/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
+                "C:/Users/andre/.platformio/packages/framework-arduino-avr/libraries/HID/src",
+                ""
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true,
+                "path": [
+                    "C:/Users/andre/OneDrive - Technical University of Moldova/Projects/MES_Device_Platform/include",
+                    "C:/Users/andre/OneDrive - Technical University of Moldova/Projects/MES_Device_Platform/src",
+                    "C:/Users/andre/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
+                    "C:/Users/andre/OneDrive - Technical University of Moldova/Projects/MES_Device_Platform/.pio/libdeps/nanoatmega328/Adafruit PWM Servo Driver Library",
+                    "C:/Users/andre/OneDrive - Technical University of Moldova/Projects/MES_Device_Platform/.pio/libdeps/nanoatmega328/WiFiEsp/src",
+                    "C:/Users/andre/OneDrive - Technical University of Moldova/Projects/MES_Device_Platform/.pio/libdeps/nanoatmega328/PubSubClient/src",
+                    "C:/Users/andre/OneDrive - Technical University of Moldova/Projects/MES_Device_Platform/.pio/libdeps/nanoatmega328/TimerOne",
+                    "C:/Users/andre/OneDrive - Technical University of Moldova/Projects/MES_Device_Platform/.pio/libdeps/nanoatmega328/FreeRTOS/src",
+                    "C:/Users/andre/OneDrive - Technical University of Moldova/Projects/MES_Device_Platform/.pio/libdeps/nanoatmega328/Servo/src",
+                    "C:/Users/andre/OneDrive - Technical University of Moldova/Projects/MES_Device_Platform/.pio/libdeps/nanoatmega328/LiquidCrystal_I2C",
+                    "C:/Users/andre/OneDrive - Technical University of Moldova/Projects/MES_Device_Platform/.pio/libdeps/nanoatmega328/mcp_can",
+                    "C:/Users/andre/OneDrive - Technical University of Moldova/Projects/MES_Device_Platform/.pio/libdeps/nanoatmega328/ArduinoJson/src",
+                    "C:/Users/andre/OneDrive - Technical University of Moldova/Projects/MES_Device_Platform/.pio/libdeps/nanoatmega328/BH1750/src",
+                    "C:/Users/andre/OneDrive - Technical University of Moldova/Projects/MES_Device_Platform/.pio/libdeps/nanoatmega328/Adafruit BMP085 Library",
+                    "C:/Users/andre/OneDrive - Technical University of Moldova/Projects/MES_Device_Platform/.pio/libdeps/nanoatmega328/Adafruit BusIO",
+                    "C:/Users/andre/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
+                    "C:/Users/andre/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
+                    "C:/Users/andre/OneDrive - Technical University of Moldova/Projects/MES_Device_Platform/.pio/libdeps/nanoatmega328/DHT sensor library",
+                    "C:/Users/andre/OneDrive - Technical University of Moldova/Projects/MES_Device_Platform/.pio/libdeps/nanoatmega328/Adafruit Unified Sensor",
+                    "C:/Users/andre/.platformio/packages/framework-arduino-avr/cores/arduino",
+                    "C:/Users/andre/.platformio/packages/framework-arduino-avr/variants/eightanaloginputs",
+                    "C:/Users/andre/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
+                    "C:/Users/andre/.platformio/packages/framework-arduino-avr/libraries/HID/src",
+                    ""
+                ]
+            },
+            "defines": [
+                "PLATFORMIO=60118",
+                "ARDUINO_AVR_NANO",
+                "MCU_TYPE_AVR",
+                "F_CPU=16000000L",
+                "ARDUINO_ARCH_AVR",
+                "ARDUINO=10808",
+                "__AVR_ATmega328P__",
+                ""
+            ],
+            "cStandard": "gnu11",
+            "cppStandard": "gnu++11",
+            "compilerPath": "C:/Users/andre/.platformio/packages/toolchain-atmelavr/bin/avr-gcc.exe",
+            "compilerArgs": [
+                "-mmcu=atmega328p",
+                ""
+            ]
+        }
+    ],
+    "version": 4
+}
