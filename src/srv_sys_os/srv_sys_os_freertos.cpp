@@ -14,6 +14,7 @@ void ctrl_servo_adc_dc_task(void *pvParameters);
 void ctrl_soil_moist_task(void *pvParameters);
 void ctrl_temp_heat_task(void *pvParameters);
 void ctrl_temp_vent_task(void *pvParameters);
+void ctrl_can_steer_task(void *pvParameters);
 void ctrl_wheel_steer_task(void *pvParameters);
 void ctrl_wheel_tract_task(void *pvParameters);
 
@@ -101,6 +102,10 @@ void srv_sys_os_freertos_setup()
 //-----------------------------------------------------------------------------
 #ifdef USE_CTRL_TEMP_VENT
     xTaskCreate(ctrl_temp_vent_task, "ctrl_temp_vent_task", 1024, NULL, 1, NULL);
+#endif
+//-----------------------------------------------------------------------------
+#ifdef USE_CTRL_CAN_STEER
+    xTaskCreate(ctrl_can_steer_task, "ctrl_can_steer_task", 1024, NULL, 1, NULL);
 #endif
 //-----------------------------------------------------------------------------
 #ifdef USE_CTRL_WHEEL_STEER
@@ -386,6 +391,24 @@ void ctrl_temp_vent_task(void *pvParameters)
 
 //=============================================================================
 // Service modules
+//-----------------------------------------------------------------------------
+// Task for CTRL_CAN_STEER
+#ifdef USE_CTRL_CAN_STEER
+void ctrl_can_steer_task(void *pvParameters)
+{
+    ctrl_can_steer_setup();
+    vTaskDelay(CTRL_CAN_STEER_OFFSET / portTICK_PERIOD_MS);
+    TickType_t xLastWakeTime = xTaskGetTickCount();
+
+    for (;;)
+    {
+        ctrl_can_steer_loop();
+        vTaskDelayUntil(&xLastWakeTime, CTRL_CAN_STEER_REC / portTICK_PERIOD_MS);
+    }
+}
+#endif
+
+
 //-----------------------------------------------------------------------------
 // Task for CTRL_WHEEL_STEER
 #ifdef USE_CTRL_WHEEL_STEER

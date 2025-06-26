@@ -4,7 +4,7 @@
 
 #include "ecu_config.h"
 #include "ecu_modules.h"
- 
+
 #ifndef SRV_UI_SERIAL_BAUDRATE
 #define SRV_UI_SERIAL_BAUDRATE 115200
 #endif
@@ -65,7 +65,6 @@
 #include "dd_lights/dd_lights_term.h"
 #endif
 
-
 //-----------------------------------------------
 // include ECU report components
 #ifdef USE_ED_DHT
@@ -84,662 +83,167 @@
 #include "ed_relay/ed_relay_term.h"
 #endif
 
-
-
-
 void srv_ui_serial_setup()
 {
-  Serial.begin(SRV_UI_SERIAL_BAUDRATE);
-  Serial.println(F("SRV_SERIAL: Device System started"));
+      Serial.begin(SRV_UI_SERIAL_BAUDRATE);
+      Serial.println(F("SRV_SERIAL: Device System started"));
+}
+
+void srv_ui_serial_in_green_house(char cmd)
+{
+
+#if defined USE_CTRL_TEMP_VENT
+      ctrl_temp_vent_term_cmd(cmd);
+#elif defined USE_DD_WINDOW
+      dd_window_term_cmd(cmd);
+#elif defined USE_ED_RELAY // 1,2
+      ed_relay_term_cmd(cmd);
+#endif
+
+#if defined USE_CTRL_TEMP_HEAT
+      ctrl_temp_heat_term_cmd(cmd);
+#elif defined USE_DD_HEATER
+      dd_heater_term_cmd(cmd);
+#elif defined USE_ED_RELAY // 3
+      ed_relay_term_cmd(cmd);
+#endif
+
+#if defined USE_CTRL_AIR_HUM
+      ctrl_air_hum_term_cmd(cmd);
+#elif defined USE_DD_VALVE
+      dd_valve_term_cmd(cmd);
+#elif defined USE_ED_RELAY // 4
+      ed_relay_term_cmd(cmd);
+#endif
+
+#if defined USE_CTRL_SOIL_MOIST
+      ctrl_soil_moist_term_cmd(cmd);
+#elif defined USE_DD_VALVE
+      dd_valve_term_cmd(cmd);
+#elif defined USE_ED_RELAY // 5
+      ed_relay_term_cmd(cmd);
+#endif
+
+#if defined USE_CTRL_AIR_PRESS
+      ctrl_air_press_term_cmd(cmd);
+#elif defined USE_DD_AIR_PUMP
+      dd_air_pump_term_cmd(cmd);
+#elif defined USE_ED_RELAY // 6
+      ed_relay_term_cmd(cmd);
+#endif
+
+#if defined USE_CTRL_LIGHTS
+      ctrl_lights_term_cmd(cmd);
+#elif defined USE_DD_LIGHTS
+      dd_lights_term_cmd(cmd);
+#elif defined USE_ED_RELAY // 7
+      ed_relay_term_cmd(cmd);
+#endif
+}
+
+void srv_ui_serial_in_can_steer(char cmd)
+{
 }
 
 void srv_ui_serial_in_loop()
 {
-  if (Serial.available())
-  {
-    char cmd = Serial.read();
+      if (Serial.available())
+      {
+            char cmd = Serial.read();
 
-    Serial.print(F("SRV_UI_SERIAL: Recived command: "));
-    Serial.println(cmd);
+            Serial.print(F("SRV_UI_SERIAL: Recived command: "));
+            Serial.println(cmd);
 
-    switch (cmd)
-    {
+            // Process command for green house
 
-    case 'z': //  manual or automat control
-#if defined USE_CTRL_TEMP_VENT
-      if (ctrl_temp_vent_is_enabled())
-      { // go to manual control
-        Serial.println(F(" CTRL_TEMP_VENT:  Change mode to MANUAL"));
-        ctrl_temp_vent_set_mode_manual();
+            srv_ui_serial_in_green_house(cmd);
       }
-      else
-      { // go to automat control
-        Serial.println(F(" CTRL_TEMP_VENT:  Change mode to AUTO"));
-        ctrl_temp_vent_set_mode_auto();
-      }
-#endif
-#if defined USE_DD_WINDOW
-      dd_window_stop();
-      Serial.println(F("DD_WINDOW: STOP Command"));
-#elif defined USE_ED_RELAY
-      Serial.println(F("DD_RELAY: STOP Command"));
-      ed_relay_off(ED_RELAY_ID_1);
-      ed_relay_off(ED_RELAY_ID_2);
-#else
-      Serial.println(F("CTRL_TEMP_VENT: AUTO/MANUAL/STOP Command <no action>"));
-#endif
-      break;
-
-    case 'q': // UP
-#if defined USE_CTRL_TEMP_VENT
-      if (ctrl_temp_vent_is_enabled())
-      {
-        ctrl_temp_vent_setpoint_up(0.1);
-        Serial.print(F("CTRL_TEMP_VENT: Increase Setpoint:"));
-        int sp = ctrl_temp_vent_get_setpoint();
-        Serial.println(sp);
-      }
-      else
-      {
-        dd_window_open(CTRL_TEMP_VENT_OP_D_TIME);
-        Serial.println(F("CTRL_TEMP_VENT: Manual Window opening"));
-      }
-#elif defined USE_DD_WINDOW
-      dd_window_open(4 * TIME_SEC / DD_WINDOW_REC);
-      Serial.println(F("DD_WINDOW: Window opening"));
-#elif defined USE_ED_RELAY
-      ed_relay_on(ED_RELAY_ID_1);
-      ed_relay_off(ED_RELAY_ID_2);
-      Serial.println(F("DD_WINDOW: Window opening"));
-#else
-      Serial.println(F("CTRL_TEMP_VENT: OPEN/SP_Up Command <no action>"));
-#endif
-      break;
-
-    case 'a': // Down
-#if defined USE_CTRL_TEMP_VENT
-      if (ctrl_temp_vent_is_enabled())
-      {
-        ctrl_temp_vent_setpoint_dn(0.1);
-        Serial.print(F("CTRL_TEMP_VENT: Decreasing Setpoint:"));
-        int sp = ctrl_temp_vent_get_setpoint();
-        Serial.println(sp);
-      }
-      else
-      {
-        dd_window_close(CTRL_TEMP_VENT_OP_D_TIME);
-        Serial.println(F(" DD_WINDOW: Window Closing"));
-      }
-#elif defined USE_DD_WINDOW
-      dd_window_close(4 * TIME_SEC / DD_WINDOW_REC);
-      Serial.println(F("DD_WINDOW: Window closing"));
-#elif defined USE_ED_RELAY
-      ed_relay_off(ED_RELAY_ID_1);
-      ed_relay_on(ED_RELAY_ID_2);
-      Serial.println(F(" ED_RELAY: Window Closing"));
-#else
-      Serial.println(F("CTRL_TEMP_VENT: CLOSE/SP_Dn Command <no action>"));
-#endif
-      break;
-    case 'x': //  manual or automat control
-#if defined USE_CTRL_TEMP_HEAT
-      if (ctrl_temp_heat_is_enabled())
-      { // go to manual control
-        Serial.println(F(" CTRL_TEMP_HEAT:  Change mode to MANUAL"));
-        ctrl_temp_heat_set_mode_manual();
-      }
-      else
-      { // go to automat control
-        Serial.println(F(" CTRL_TEMP_HEAT:  Change mode to AUTO"));
-        ctrl_temp_heat_set_mode_auto();
-      }
-#endif
-#if defined USE_DD_HEATER
-      dd_heater_off();
-      Serial.println(F("DD_HEATER: STOP Command"));
-#elif defined USE_ED_RELAY
-      Serial.println(F("DD_RELAY: STOP Command"));
-      ed_relay_off(ED_RELAY_ID_3);
-#else
-      Serial.println(F("CTRL_TEMP_HEAT: AUTO/MANUAL/STOP Command <no action>"));
-#endif
-      break;
-
-    case 'w': // UP
-#if defined USE_CTRL_TEMP_HEAT
-      if (ctrl_temp_heat_is_enabled())
-      {
-        ctrl_temp_heat_setpoint_up(0.1);
-        Serial.print(F("CTRL_TEMP_HEAT: Increase Setpoint:"));
-        int sp = ctrl_temp_heat_get_setpoint();
-        Serial.println(sp);
-      }
-      else
-      {
-        dd_heater_on(CTRL_TEMP_HEAT_OP_D_TIME);
-        Serial.println(F("CTRL_TEMP_HEAT: Manual Heater ON"));
-      }
-#elif defined USE_DD_HEATER
-      dd_heater_on(CTRL_TEMP_HEAT_OP_D_TIME);
-      Serial.println(F("DD_HEATER: Heater ON"));
-#elif defined USE_ED_RELAY
-      ed_relay_on(ED_RELAY_ID_3);
-      Serial.println(F("DD_HEATER: Heater ON"));
-#else
-      Serial.println(F("CTRL_TEMP_HEAT: Hea_ON/SP_Up Command <no action>"));
-#endif
-      break;
-
-    case 's': // Down
-#if defined USE_CTRL_TEMP_HEAT
-      if (ctrl_temp_heat_is_enabled())
-      {
-        ctrl_temp_heat_setpoint_dn(0.1);
-        Serial.print(F("CTRL_TEMP_HEAT: Decreasing Setpoint:"));
-        int sp = ctrl_temp_heat_get_setpoint();
-        Serial.println(sp);
-      }
-      else
-      {
-        dd_heater_off();
-        Serial.println(F(" DD_HEATER: Heater OFF"));
-      }
-#elif defined USE_DD_HEATER
-      dd_heater_off();
-      Serial.println(F("DD_HEATER: Heater OFF"));
-#elif defined USE_ED_RELAY
-      ed_relay_off(ED_RELAY_ID_3);
-      Serial.println(F(" ED_RELAY: Heater OFF"));
-#else
-      Serial.println(F("CTRL_TEMP_HEAT: Hea_OFF/SP_Dn Command <no action>"));
-#endif
-      break;
-
-    case 'c': //  manual or automat control
-#if defined USE_CTRL_AIR_HUM
-      if (ctrl_air_hum_is_enabled())
-      { // go to manual control
-        Serial.println(F(" CTRL_AIR_HUM:  Change mode to MANUAL"));
-        ctrl_air_hum_set_mode_manual();
-      }
-      else
-      { // go to automat control
-        Serial.println(F(" CTRL_AIR_HUM:  Change mode to AUTO"));
-        ctrl_air_hum_set_mode_auto();
-      }
-#elif defined USE_DD_VALVE
-      dd_valve_off();
-      Serial.println(F("DD_VALVE: STOP Command"));
-#elif defined USE_ED_RELAY
-      Serial.println(F("DD_RELAY: STOP Command"));
-      ed_relay_off(ED_RELAY_ID_3);
-#else
-      Serial.println(F("CTRL_AIR_HUM: AUTO/MANUAL/STOP Command <no action>"));
-#endif
-      break;
-    case 'e': // UP
-#if defined USE_CTRL_AIR_HUM
-      if (ctrl_air_hum_is_enabled())
-      {
-        ctrl_air_hum_setpoint_up(0.1);
-        Serial.print(F("CTRL_AIR_HUM: Increase Setpoint:"));
-        int sp = ctrl_air_hum_get_setpoint();
-        Serial.println(sp);
-      }
-      else
-      {
-        dd_valve_on(CTRL_AIR_HUM_OP_D_TIME);
-        Serial.println(F("CTRL_AIR_HUM: Manual Valve opening"));
-      }
-#elif defined USE_DD_VALVE
-      dd_valve_on(4 * TIME_SEC / DD_VALVE_REC);
-      Serial.println(F("DD_VALVE: Valve opening"));
-#elif defined USE_ED_RELAY
-      ed_relay_on(ED_RELAY_ID_4);
-      Serial.println(F("DD_VALVE: Valve opening"));
-#else
-      Serial.println(F("CTRL_AIR_HUM: OPEN/SP_Up Command <no action>"));
-#endif
-      break;
-
-    case 'd': // Down
-#if defined USE_CTRL_AIR_HUM
-      if (ctrl_air_hum_is_enabled())
-      {
-        ctrl_air_hum_setpoint_dn(0.1);
-        Serial.print(F("CTRL_AIR_HUM: Decreasing Setpoint:"));
-        int sp = ctrl_air_hum_get_setpoint();
-        Serial.println(sp);
-      }
-      else
-      {
-        dd_valve_off();
-        Serial.println(F(" DD_VALVE: Valve Closing"));
-      }
-#elif defined USE_DD_VALVE
-      dd_valve_off();
-      Serial.println(F("DD_VALVE: Valve closing"));
-#elif defined USE_ED_RELAY
-      ed_relay_off(ED_RELAY_ID_4);
-      Serial.println(F(" ED_RELAY: Valve Closing"));
-#else
-      Serial.println(F("CTRL_AIR_HUM: CLOSE/SP_Dn Command <no action>"));
-#endif
-      break;
-
-      break;
-
-    case 'v': //  manual or automat control
-#if defined USE_CTRL_SOIL_MOIST
-      if (ctrl_soil_moist_is_enabled())
-      { // go to manual control
-        Serial.println(F(" CTRL_SOIL_MOIST:  Change mode to MANUAL"));
-        ctrl_soil_moist_set_mode_manual();
-      }
-      else
-      { // go to automat control
-        Serial.println(F(" CTRL_SOIL_MOIST:  Change mode to AUTO"));
-        ctrl_soil_moist_set_mode_auto();
-      }
-#elif defined USE_DD_VALVE
-      dd_valve_off();
-      Serial.println(F("DD_VALVE: STOP Command"));
-#elif defined USE_ED_RELAY
-      Serial.println(F("DD_RELAY: STOP Command"));
-      ed_relay_off(ED_RELAY_ID_5);
-#else
-      Serial.println(F("CTRL_SOIL_MOIST: AUTO/MANUAL/STOP Command <no action>"));
-#endif
-      break;
-    case 'r': // UP
-#if defined USE_CTRL_SOIL_MOIST
-      if (ctrl_soil_moist_is_enabled())
-      {
-        ctrl_soil_moist_setpoint_up(0.1);
-        Serial.print(F("CTRL_SOIL_MOIST: Increase Threshold:"));
-        float threshold = ctrl_soil_moist_get_setpoint();
-        Serial.println(threshold);
-      }
-      else
-      {
-        dd_valve_on(CTRL_SOIL_MOIST_OP_D_TIME);
-        Serial.println(F("CTRL_SOIL_MOIST: Valve opening"));
-      }
-#elif defined USE_DD_VALVE
-      dd_valve_on(DD_VALVE_OP_D_TIME);
-      Serial.println(F("DD_VALVE: Valve opening"));
-#elif defined USE_ED_RELAY
-      ed_relay_on(ED_RELAY_ID_5);
-      Serial.println(F("DD_VALVE: Valve opening"));
-#else
-      Serial.println(F("CTRL_SOIL_MOIST: OPEN/Threshold_Up Command <no action>"));
-#endif
-      break;
-
-    case 'f': // Down
-#if defined USE_CTRL_SOIL_MOIST
-      if (ctrl_soil_moist_is_enabled())
-      {
-        ctrl_soil_moist_setpoint_up(0.1);
-        Serial.print(F("CTRL_SOIL_MOIST: Decreasing Threshold:"));
-        float threshold = ctrl_soil_moist_get_setpoint();
-        Serial.println(threshold);
-      }
-      else
-      {
-        dd_valve_off();
-        Serial.println(F(" DD_VALVE: Valve Closing"));
-      }
-#elif defined USE_DD_VALVE
-      dd_valve_off();
-      Serial.println(F("DD_VALVE: Valve closing"));
-#elif defined USE_ED_RELAY
-      ed_relay_off(ED_RELAY_ID_5);
-      Serial.println(F(" ED_RELAY: Valve Closing"));
-#else
-      Serial.println(F("CTRL_SOIL_MOIST: CLOSE/Threshold_Down Command <no action>"));
-#endif
-      break;
-
-    case 'b': //  manual or automat control
-#if defined USE_CTRL_AIR_PRESS
-      if (ctrl_air_press_is_enabled())
-      { // go to manual control
-        Serial.println(F(" CTRL_AIR_PRESS:  Change mode to MANUAL"));
-        ctrl_air_press_set_mode_manual();
-      }
-      else
-      { // go to automat control
-        Serial.println(F(" CTRL_AIR_PRESS:  Change mode to AUTO"));
-        ctrl_air_press_set_mode_auto();
-      }
-#elif defined USE_DD_AIR_PUMP
-      dd_air_pump_off();
-      Serial.println(F("DD_AIR_PUMP: STOP Command"));
-#elif defined USE_ED_RELAY
-      Serial.println(F("DD_RELAY: STOP Command"));
-      ed_relay_off(ED_RELAY_ID_6);
-#else
-      Serial.println(F("CTRL_AIR_PRESS: AUTO/MANUAL/STOP Command <no action>"));
-#endif
-      break;
-    case 't': // UP
-#if defined USE_CTRL_AIR_PRESS
-      if (ctrl_air_press_is_enabled())
-      {
-        ctrl_air_press_setpoint_up(0.1);
-        Serial.print(F("CTRL_AIR_PRESS: Increase Setpoint:"));
-        int sp = ctrl_air_press_get_setpoint();
-        Serial.println(sp);
-      }
-      else
-      {
-        dd_air_pump_on(DD_AIR_PUMP_OP_D_TIME);
-        Serial.println(F("CTRL_AIR_PRESS: Manual Air_press ON"));
-      }
-#elif defined USE_DD_AIR_PUMP
-      dd_air_pump_on(DD_AIR_PUMP_OP_D_TIME);
-      Serial.println(F("DD_AIR_PUMP: Air_pump ON"));
-#elif defined USE_ED_RELAY
-      ed_relay_on(ED_RELAY_ID_6);
-      Serial.println(F("DD_RELAY: Air_pump ON"));
-#else
-      Serial.println(F("CTRL_AIR_PRESS: Light_ON/SP_Up Command <no action>"));
-#endif
-      break;
-
-    case 'g': // Down
-#if defined USE_CTRL_AIR_PRESS
-      if (ctrl_air_press_is_enabled())
-      {
-        ctrl_air_press_setpoint_dn(0.1);
-        Serial.print(F("CTRL_AIR_PRESS: Decreasing Setpoint:"));
-        int sp = ctrl_air_press_get_setpoint();
-        Serial.println(sp);
-      }
-      else
-      {
-        dd_air_pump_off();
-        Serial.println(F(" DD_AIR_PUMP: Air_press OFF"));
-      }
-#elif defined USE_DD_AIR_PUMP
-      dd_air_pump_off();
-      Serial.println(F("DD_AIR_PUMP: Air_press OFF"));
-#elif defined USE_ED_RELAY
-      ed_relay_off(ED_RELAY_ID_6);
-      Serial.println(F(" ED_RELAY: Air_press OFF"));
-#else
-      Serial.println(F("CTRL_AIR_PRESS: Light_OFF/SP_Dn Command <no action>"));
-#endif
-      break;
-
-    case 'n': //  manual or automat control
-#if defined USE_CTRL_LIGHTS
-      if (ctrl_lights_is_enabled())
-      { // go to manual control
-        Serial.println(F(" CTRL_LIGHTS:  Change mode to MANUAL"));
-        ctrl_lights_set_mode_manual();
-      }
-      else
-      { // go to automat control
-        Serial.println(F(" CTRL_LIGHTS:  Change mode to AUTO"));
-        ctrl_lights_set_mode_auto();
-      }
-#elif defined USE_DD_LIGHTS
-      dd_lights_stop();
-      Serial.println(F("DD_LIGHTS: STOP Command"));
-#elif defined USE_ED_RELAY
-      Serial.println(F("DD_RELAY: STOP Command"));
-      ed_relay_off(ED_RELAY_ID_8);
-#else
-      Serial.println(F("CTRL_LIGHTS: AUTO/MANUAL/STOP Command <no action>"));
-#endif
-      break;
-    case 'y': // UP
-#if defined USE_CTRL_LIGHTS
-      if (ctrl_lights_is_enabled())
-      {
-        ctrl_lights_setpoint_up(0.1);
-        Serial.print(F("CTRL_LIGHTS: Increase Setpoint:"));
-        int sp = ctrl_lights_get_setpoint();
-        Serial.println(sp);
-      }
-      else
-      {
-        dd_lights_on(-1);
-        Serial.println(F("CTRL_LIGHTS: Manual Lights ON"));
-      }
-#elif defined USE_DD_LIGHTS
-      dd_lights_on(CTRL_LIGHTS_OP_D_TIME);
-      Serial.println(F("DD_LIGHTS: Lights ON"));
-#elif defined USE_ED_RELAY
-      ed_relay_on(ED_RELAY_ID_8);
-      Serial.println(F("DD_LIGHTS: Lights ON"));
-#else
-      Serial.println(F("CTRL_LIGHTS: Light_ON/SP_Up Command <no action>"));
-#endif
-      break;
-
-    case 'h': // Down
-#if defined USE_CTRL_LIGHTS
-      if (ctrl_lights_is_enabled())
-      {
-        ctrl_lights_setpoint_dn(0.1);
-        Serial.print(F("CTRL_LIGHTS: Decreasing Setpoint:"));
-        int sp = ctrl_lights_get_setpoint();
-        Serial.println(sp);
-      }
-      else
-      {
-        dd_lights_off();
-        Serial.println(F(" DD_LIGHTS: Lights OFF"));
-      }
-#elif defined USE_DD_LIGHTS
-      dd_lights_off(4 * TIME_SEC / DD_LIGHTS_REC);
-      Serial.println(F("DD_LIGHTS: Lights OFF"));
-#elif defined USE_ED_RELAY
-      ed_relay_off(ED_RELAY_ID_8);
-      Serial.println(F(" ED_RELAY: Lights OFF"));
-#else
-      Serial.println(F("CTRL_LIGHTS: Light_OFF/SP_Dn Command <no action>"));
-#endif
-      break;
-
-    default:
-      break;
-    }
-  }
 }
 
 void srv_ui_serial_out_loop()
 {
-  Serial.println(F("=============== MLP: System Report =============== "));
+      Serial.println(F("=============== MLP: System Report =============== "));
 
 //-----------------------------------------------
 //  Report Control components state
 #ifdef USE_CTRL_TEMP_VENT
-  ctrl_temp_vent_report();
+      ctrl_temp_vent_report();
 #endif
 #ifdef USE_CTRL_TEMP_HEAT
-  ctrl_temp_heat_report();
+      ctrl_temp_heat_report();
 #endif
 #ifdef USE_CTRL_AIR_HUM
-  ctrl_air_hum_report();
+      ctrl_air_hum_report();
 #endif
 #ifdef USE_CTRL_SOIL_MOIST
-  ctrl_soil_moist_report();
+      ctrl_soil_moist_report();
 #endif
 #ifdef USE_CTRL_AIR_PRESS
-  ctrl_air_press_report();
+      ctrl_air_press_report();
 #endif
 #ifdef USE_CTRL_LIGHTS
-  ctrl_lights_report();
+      ctrl_lights_report();
 #endif
 
 //-----------------------------------------------
 //  Report Sensor components state
 #ifdef USE_SRV_SNS_AIR_TEMP
-  srv_sns_air_temp_report();
+      srv_sns_air_temp_report();
 #endif
 #ifdef USE_SRV_SNS_AIR_HUM
-  srv_sns_air_hum_report();
+      srv_sns_air_hum_report();
 #endif
 #ifdef USE_SRV_SNS_SOIL_MOIST
-  srv_sns_soil_moist_report();
+      srv_sns_soil_moist_report();
 #endif
 #ifdef USE_SRV_SNS_AIR_PRESS
-  srv_sns_air_press_report();
+      srv_sns_air_press_report();
 #endif
 #ifdef USE_SRV_SNS_LIGHT
-  srv_sns_light_report();
+      srv_sns_light_report();
 #endif
 
 // initialize services
 #ifdef USE_SRV_COM_CAN
-  dd_can_matrix_report();
+      dd_can_matrix_report();
 // dd_can_signal_setup();
 #endif
 //-----------------------------------------------
 //  Report Actuator components state
 #ifdef USE_DD_WINDOW
-  dd_window_report();
+      dd_window_report();
 #endif
 #ifdef USE_DD_HEATER
-  dd_heater_report();
+      dd_heater_report();
 #endif
 #ifdef USE_DD_VALVE
-  dd_valve_report();
+      dd_valve_report();
 #endif
 #ifdef USE_DD_AIR_PUMP
-  dd_air_pump_report();
+      dd_air_pump_report();
 #endif
 #ifdef USE_DD_LIGHTS
-  dd_lights_report();
+      dd_lights_report();
 #endif
 
 //-----------------------------------------------
 //  Report ECU components state
 #ifdef USE_ED_DHT
-  ed_dht_report();
+      ed_dht_report();
 #endif
 #ifdef USE_ED_SNS_SOIL_MOIST
-  ed_sns_soil_moist_report();
+      ed_sns_soil_moist_report();
 #endif
 #ifdef USE_ED_BMP
-  ed_bmp_report();
+      ed_bmp_report();
 #endif
 #ifdef USE_ED_BH1750
-  ed_bh1750_report();
+      ed_bh1750_report();
 #endif
 
 #ifdef USE_ED_RELAY
-  ed_relay_report();
+      ed_relay_report();
 #endif
 
-  Serial.println();
+      Serial.println();
 }
-
-// void ctrl_temp_vent_report()
-// {
-// #ifdef USE_CTRL_TEMP_VENT
-
-//   if (ctrl_temp_vent_is_enabled())
-//   {
-//     Serial.print(F("CTRL_VENT: Mode AUTO-"));
-//   }
-//   else
-//   {
-//     Serial.print(F("CTRL_VENT: Mode MANUAL-"));
-//   }
-//   Serial.println(CTRL_TEMP_VENT_REC);
-
-//   float temp_setpoint = ctrl_temp_vent_get_setpoint();
-//   Serial.print(F("CTRL_VENT: SP: "));
-//   Serial.print(temp_setpoint);
-//   Serial.print(F("°C "));
-
-//   Serial.print(F("HIST[OP: "));
-//   Serial.print(temp_setpoint + CTRL_TEMP_VENT_HISTERESIS);
-//   Serial.print(F("°C  "));
-
-//   Serial.print(F("CL: "));
-//   Serial.print(temp_setpoint - CTRL_TEMP_VENT_HISTERESIS);
-//   Serial.print(F("°C] "));
-
-//   float temp_current = ctrl_temp_vent_get_current_temp();
-//   Serial.print(F("CTRL_VENT: Cur: "));
-//   Serial.print(temp_current);
-//   Serial.println(F("°C"));
-
-// #endif
-// }
-
-// void ctrl_temp_heat_report()
-// {
-// #ifdef USE_CTRL_TEMP_HEAT
-
-//   if (ctrl_temp_heat_is_enabled())
-//   {
-//     Serial.print(F("CTRL_VENT: Mode AUTO-"));
-//   }
-//   else
-//   {
-//     Serial.print(F("CTRL_VENT: Mode MANUAL-"));
-//   }
-//   Serial.print(CTRL_TEMP_HEAT_REC);
-
-//   float temp_setpoint = ctrl_temp_heat_get_setpoint();
-//   Serial.print(F(" : SP: "));
-//   Serial.print(temp_setpoint);
-//   Serial.print(F("°C "));
-
-//   Serial.print(F("HIST[OP: "));
-//   Serial.print(temp_setpoint + CTRL_TEMP_HEAT_HISTERESIS);
-//   Serial.print(F("°C  "));
-
-//   Serial.print(F("CL: "));
-//   Serial.print(temp_setpoint - CTRL_TEMP_HEAT_HISTERESIS);
-//   Serial.print(F("°C] "));
-
-//   float temp_current = ctrl_temp_heat_get_current_temp();
-//   Serial.print(F("  Cur: "));
-//   Serial.print(temp_current);
-//   Serial.println(F("°C"));
-
-// #endif
-// }
-
-
-
-// void ctrl_temp_heat_report()
-// {
-// #ifdef USE_CTRL_TEMP_HEAT
-//   if (ctrl_temp_heat_is_enabled())
-//   {
-//     Serial.println(F("CTRL_HEAT: Mode AUTO "));
-//   }
-//   else
-//   {
-//     Serial.println(F("CTRL_HEAT: Mode MANUAL"));
-//   }
-
-//   float temp_setpoint = ctrl_temp_heat_get_setpoint();
-//   Serial.print(F("CTRL_HEAT: SP: "));
-//   Serial.print(temp_setpoint);
-//   Serial.print(F("°C "));
-
-//   Serial.print(F("HIST[OP: "));
-//   Serial.print(temp_setpoint + CTRL_TEMP_HEAT_HISTERESIS);
-//   Serial.print(F("°C  "));
-
-//   Serial.print(F("CL: "));
-//   Serial.print(temp_setpoint - CTRL_TEMP_HEAT_HISTERESIS);
-//   Serial.print(F("°C] "));
-
-//   float temp_current = ctrl_temp_heat_get_current_temp();
-//   Serial.print(F("CTRL_HEAT: Cur: "));
-//   Serial.print(temp_current);
-//   Serial.println(F("°C"));
-// #endif
-// }
-

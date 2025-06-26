@@ -36,6 +36,10 @@
 #include "ctrl_temp_vent/ctrl_temp_vent.h"
 #endif
 //-----------------------------------------------------------------------------
+#ifdef USE_CTRL_CAN_STEER
+#include "ctrl_can_steer/ctrl_can_steer.h"
+#endif
+//-----------------------------------------------------------------------------
 #ifdef USE_CTRL_WHEEL_STEER
 #include "ctrl_wheel_steer/ctrl_wheel_steer.h"
 #endif

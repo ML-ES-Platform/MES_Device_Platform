@@ -9,6 +9,14 @@
 #define DD_LIGHTS_ON    ED_RELAY_ON
 #define DD_LIGHTS_OFF   ED_RELAY_OFF
 
+#ifndef DD_LIGHTS_REC
+#define DD_LIGHTS_REC (100) // Default lights cycle time in milliseconds
+#endif
+
+#ifndef DD_LIGHTS_OP_D_TIME
+#define DD_LIGHTS_OP_D_TIME (4 * TIME_SEC / DD_LIGHTS_REC)
+#endif
+
 
 void dd_lights_setup();
 void dd_lights_loop();

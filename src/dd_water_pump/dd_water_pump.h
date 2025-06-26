@@ -9,6 +9,15 @@
 #define DD_WATER_PUMP_ON    ED_RELAY_ON
 #define DD_WATER_PUMP_OFF   ED_RELAY_OFF
 
+#ifndef DD_WATER_PUMP_REC
+#define DD_WATER_PUMP_REC (100)
+#endif
+
+#ifndef DD_WATER_PUMP_OP_D_TIME
+#define DD_WATER_PUMP_OP_D_TIME (4 * TIME_SEC / DD_WATER_PUMP_REC)
+#endif
+
+
 
 void dd_water_pump_setup();
 void dd_water_pump_loop();

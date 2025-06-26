@@ -7,5 +7,7 @@
 
 // Declare any function prototypes here
 void ctrl_air_hum_report();
+void ctrl_air_hum_cmd_help();
+void ctrl_air_hum_term_cmd(char cmd);
 
 #endif // CTRL_AIR_HUM_TERM_H

@@ -1,5 +1,6 @@
 #include "ctrl_air_press_term.h"
 #include "ctrl_air_press.h"
+#include "dd_air_pump/dd_air_pump.h"
 #include "Arduino.h"
 
 
@@ -47,4 +48,74 @@ void ctrl_air_press_report()
 
     Serial.println();
 
+}
+
+void ctrl_air_press_cmd_help()
+{
+  Serial.println(F("CTRL_AIR_PRESS: Commands:"));
+  Serial.println(F(" b - Change mode AUTO/MANUAL"));
+  Serial.println(F(" t - Setpoint UP / Air_press ON"));
+  Serial.println(F(" g - Setpoint DOWN / Air_press OFF"));
+}
+
+void ctrl_air_press_term_cmd(char cmd)
+{
+  Serial.print(F("CTRL_AIR_PRESS: Received command: "));
+  Serial.println(cmd);
+
+  switch (cmd)
+  {
+    case '?': // help
+      ctrl_air_press_cmd_help();
+      break;
+
+    case '`': // report
+      ctrl_air_press_report();
+      break;
+
+    case 'b': //  manual or automat control
+      if (ctrl_air_press_is_enabled())
+      { // go to manual control
+        Serial.println(F(" CTRL_AIR_PRESS:  Change mode to MANUAL"));
+        ctrl_air_press_set_mode_manual();
+      }
+      else
+      { // go to automat control
+        Serial.println(F(" CTRL_AIR_PRESS:  Change mode to AUTO"));
+        ctrl_air_press_set_mode_auto();
+      }
+      break;
+    case 't': // UP
+      if (ctrl_air_press_is_enabled())
+      {
+        ctrl_air_press_setpoint_up(0.1);
+        Serial.print(F("CTRL_AIR_PRESS: Increase Setpoint:"));
+        float sp = ctrl_air_press_get_setpoint();
+        Serial.println(sp);
+      }
+      else
+      {
+       dd_air_pump_on(CTRL_AIR_PRESS_OP_D_TIME);
+        Serial.println(F("CTRL_AIR_PRESS: Manual Air_press ON"));
+      }
+      break;
+    case 'g': // Down
+      if (ctrl_air_press_is_enabled())
+      {
+        ctrl_air_press_setpoint_dn(0.1);
+        Serial.print(F("CTRL_AIR_PRESS: Decreasing Setpoint:"));
+        float sp = ctrl_air_press_get_setpoint();
+        Serial.println(sp);
+      }
+      else
+      {
+        dd_air_pump_off();
+        Serial.println(F(" DD_AIR_PUMP: Air_press OFF"));
+      }
+      break;
+    default:
+      Serial.println(F("CTRL_AIR_PRESS: Unknown command"));
+      ctrl_air_press_cmd_help();
+      break;
+  }
 }

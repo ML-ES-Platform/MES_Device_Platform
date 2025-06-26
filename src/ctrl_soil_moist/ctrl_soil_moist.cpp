@@ -96,11 +96,11 @@ void ctrl_soil_moist_loop()
       // ON OFF Control cu Histereza
       if (moist_current > moist_off)
       {
-        dd_valve_off();
+        dd_valve_off(DD_VALVE_ID_2);
       }
       else if (moist_current < moist_on)
       {
-        dd_valve_on(CTRL_SOIL_MOIST_OP_D_TIME);
+        dd_valve_on(DD_VALVE_ID_2, CTRL_SOIL_MOIST_OP_D_TIME);
       }
       else
       {
@@ -109,10 +109,10 @@ void ctrl_soil_moist_loop()
     }
     else
     {
-      dd_valve_off();
+      dd_valve_off(DD_VALVE_ID_2);
     }
   }
-  if (dd_valve_get_state() == DD_VALVE_OPEN)
+  if (dd_valve_get_state(DD_VALVE_ID_2) == DD_VALVE_OPEN)
   {
     ctrl_soil_moist_output = CTRL_SOIL_MOIST_OUT_ON;
   }

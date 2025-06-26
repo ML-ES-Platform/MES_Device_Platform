@@ -20,8 +20,8 @@
 #define CTRL_AIR_PRESS_CUR_DEFAULT (1.0)
 #endif
 
-#ifndef DD_AIR_PRESS_OP_D_TIME
-#define DD_AIR_PRESS_OP_D_TIME (10.0)
+#ifndef CTRL_AIR_PRESS_OP_D_TIME
+#define CTRL_AIR_PRESS_OP_D_TIME (10.0)
 #endif
 
 #define CTRL_AIR_PRESS_OUT_OFF 0

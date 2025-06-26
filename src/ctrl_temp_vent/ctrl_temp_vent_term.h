@@ -8,5 +8,7 @@
 
 // Declare any function prototypes
 void ctrl_temp_vent_report();
+void ctrl_temp_vent_term_cmd(char cmd );
+void ctrl_temp_vent_cmd_help();
 
 #endif // CTRL_TEMP_VENT_TERM_H

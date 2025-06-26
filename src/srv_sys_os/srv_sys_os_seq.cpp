@@ -36,6 +36,10 @@ int ctrl_temp_heat_rec_cnt = CTRL_TEMP_HEAT_OFFSET;
 int ctrl_temp_vent_rec_cnt = CTRL_TEMP_VENT_OFFSET;
 #endif
 //-----------------------------------------------------------------------------
+#ifdef USE_CTRL_CAN_STEER
+int ctrl_can_steer_rec_cnt = CTRL_CAN_STEER_OFFSET;
+#endif
+//-----------------------------------------------------------------------------
 #ifdef USE_CTRL_WHEEL_STEER
 int ctrl_wheel_steer_rec_cnt = CTRL_WHEEL_STEER_OFFSET;
 #endif
@@ -221,6 +225,9 @@ void srv_sys_os_seq_setup()
 #endif
 
   // initialize device drivers
+#ifdef USE_CTRL_CAN_STEER
+  ctrl_can_steer_setup();
+#endif
 #ifdef USE_CTRL_WHEEL_STEER
   ctrl_wheel_steer_setup();
 #endif
@@ -390,6 +397,13 @@ void srv_sys_os_seq_scheduler()
   {
     ctrl_temp_vent_loop();
     ctrl_temp_vent_rec_cnt = CTRL_TEMP_VENT_REC;
+  }
+#endif
+#ifdef USE_CTRL_CAN_STEER
+  if (--ctrl_can_steer_rec_cnt <= 0)
+  {
+    ctrl_can_steer_loop();
+    ctrl_can_steer_rec_cnt = CTRL_CAN_STEER_REC;
   }
 #endif
 #ifdef USE_CTRL_WHEEL_STEER

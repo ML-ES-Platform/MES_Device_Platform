@@ -20,13 +20,13 @@
 #define CAN_MESSAGE_LEN 8
 #define RX_MSG 0
 #define TX_MSG 1
-#define CAN_MESSAGE_RECURENT 1
-#define CAN_MESSAGE_SINGLE 0
+#define CAN_MESSAGE_RECURENT 0x20
+#define CAN_MESSAGE_SINGLE 0x10
 
-#define CAN_MESSAGE_INVALID 0
-#define CAN_MESSAGE_VALID 1
-#define CAN_MESSAGE_UPDATED 3
-#define CAN_MESSAGE_NO_UPDATE 2
+#define CAN_MESSAGE_INVALID 0x00
+#define CAN_MESSAGE_VALID 0x01
+#define CAN_MESSAGE_UPDATED 0x03
+#define CAN_MESSAGE_NO_UPDATE 0x02
 
 typedef struct can_message_t
 {
@@ -38,6 +38,9 @@ typedef struct can_message_t
     uint8_t rx_msg[CAN_MESSAGE_LEN];
     uint8_t recurent;
     uint8_t updated;
+    uint8_t readed;
+    uint8_t overrided;
+
 } can_message_t;
 
 

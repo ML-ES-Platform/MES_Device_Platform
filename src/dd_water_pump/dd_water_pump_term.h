@@ -8,5 +8,7 @@
 
 // Declare any function prototypes
 void dd_water_pump_report();
+void dd_water_pump_cmd_help();
+void dd_water_pump_term_cmd(char cmd);
 
 #endif // DD_WATER_PUMP_TERM_H

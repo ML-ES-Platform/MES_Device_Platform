@@ -1,6 +1,7 @@
 
 #include "dd_heater.h"
 #include "Arduino.h"
+#include "ed_relay/ed_relay.h"
 
 int dd_heater_state;
 int dd_heater_relay = ED_RELAY_ID_3;

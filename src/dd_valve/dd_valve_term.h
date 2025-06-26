@@ -8,5 +8,7 @@
 
 // Declare function prototypes
 void dd_valve_report();
+void dd_valve_term_cmd(char cmd);
+void dd_valve_cmd_help();
 
 #endif // DD_VALVE_TERM_H

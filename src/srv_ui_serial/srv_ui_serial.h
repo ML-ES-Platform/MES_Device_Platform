@@ -8,6 +8,7 @@ void srv_ui_serial_setup();
 void srv_ui_serial_in_loop();
 void srv_ui_serial_out_loop();
 
+void srv_ui_serial_ctrl_can_steer_report();
 void srv_ui_serial_ctrl_wheel_steer_report();
 void srv_ui_serial_ctrl_wheel_tract_report();
 

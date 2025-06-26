@@ -9,6 +9,13 @@
 #define DD_AIR_PUMP_ON    ED_RELAY_ON
 #define DD_AIR_PUMP_OFF   ED_RELAY_OFF
 
+#ifndef DD_AIR_PUMP_REC
+#define DD_AIR_PUMP_REC (100 ) // 100 ms
+#endif
+
+#ifndef DD_AIR_PUMP_OP_D_TIME
+#define DD_AIR_PUMP_OP_D_TIME (1.0 * TIME_SEC / DD_AIR_PUMP_REC)
+#endif
 
 void dd_air_pump_setup();
 void dd_air_pump_loop();

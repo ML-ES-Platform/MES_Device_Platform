@@ -2,68 +2,79 @@
 #include "dd_valve.h"
 #include "Arduino.h"
 
-int dd_valve_state = DD_VALVE_CLOSE;
-int dd_valve_relay = ED_RELAY_ID_4;
+int dd_valve_state[DD_VALVE_NR_OF];
 
-int dd_valve_op_cnt = 0;
+int dd_valve_relay[DD_VALVE_NR_OF] = {
+    ED_RELAY_ID_4, // DD_VALVE_ID_4
+    ED_RELAY_ID_5, // DD_VALVE_ID_5
+};
 
-int dd_valve_set_state(int state)
+int dd_valve_op_cnt[DD_VALVE_NR_OF] ;
+
+int dd_valve_set_state(size_t valve_it, int state)
 {
     if (state == DD_VALVE_OPEN)
     {
-        dd_valve_state = DD_VALVE_OPEN;
+        dd_valve_state[valve_it] = DD_VALVE_OPEN;
     }
     else
     {
-        dd_valve_state = DD_VALVE_CLOSE;
+        dd_valve_state[valve_it] = DD_VALVE_CLOSE;
     }
-    return dd_valve_state;
+    return dd_valve_state[valve_it];
 }
 
-
-int dd_valve_get_state()
+int dd_valve_get_state(size_t valve_it)
 {
-    return dd_valve_state;
+    return dd_valve_state[valve_it];
 }
 
-int dd_valve_off()
+int dd_valve_off(size_t valve_it)
 {
-    int state = dd_valve_set_state(DD_VALVE_CLOSE);
+    int state = dd_valve_set_state(valve_it, DD_VALVE_CLOSE);
     return state;
 }
 
-int dd_valve_on(int time)
+int dd_valve_on(size_t valve_it, int time)
 {
-    int state = dd_valve_set_state(DD_VALVE_OPEN);
-    dd_valve_op_cnt = time;
+    int state = dd_valve_set_state(valve_it, DD_VALVE_OPEN);
+    dd_valve_op_cnt[valve_it] = time;
     return state;
 }
-
 
 void dd_valve_setup()
 {
-    dd_valve_off();
+    for (size_t valve_it = 0; valve_it < DD_VALVE_NR_OF; valve_it++)
+    {
+        dd_valve_off(valve_it);
+        dd_valve_op_cnt[valve_it] = 0; // set to off
+        dd_valve_state[valve_it] = DD_VALVE_CLOSE; // set to off
+    }
 }
 
 void dd_valve_loop()
 {
-    if (dd_valve_op_cnt > -1) // if not continous
+    for (size_t valve_it = 0; valve_it < DD_VALVE_NR_OF; valve_it++)
     {
-        if (--dd_valve_op_cnt <= 0)// decrement
+        if (dd_valve_op_cnt[valve_it] > -1) // if not continous
         {
-            dd_valve_op_cnt = 0;
-            dd_valve_state = DD_VALVE_CLOSE;//change to off
+            if (--dd_valve_op_cnt[valve_it] <= 0) // decrement
+            {
+                dd_valve_op_cnt[valve_it] = 0;
+                dd_valve_state[valve_it] = DD_VALVE_CLOSE; // change to off
+            }
         }
-    }
 
-    if (dd_valve_state == DD_VALVE_OPEN)
-    {
-        ed_relay_on(dd_valve_relay);
-    }
-    else
-    { // stop
-        ed_relay_off(dd_valve_relay);
-        dd_valve_op_cnt = 0;
-        dd_valve_state = DD_VALVE_CLOSE;
+        int relay_it = dd_valve_relay[valve_it];
+        if (dd_valve_state[valve_it] == DD_VALVE_OPEN)
+        {
+            ed_relay_on(relay_it);
+        }
+        else
+        { // stop
+            ed_relay_off(relay_it);
+            dd_valve_op_cnt[valve_it] = 0;
+            dd_valve_state[valve_it] = DD_VALVE_CLOSE;
+        }
     }
 }

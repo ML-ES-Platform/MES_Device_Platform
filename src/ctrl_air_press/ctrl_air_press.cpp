@@ -104,7 +104,7 @@ void ctrl_air_press_loop()
     }
     else if (press_current < press_on)
     {
-      dd_air_pump_on(DD_AIR_PRESS_OP_D_TIME);
+      dd_air_pump_on(CTRL_AIR_PRESS_OP_D_TIME);
     }
     else
     {

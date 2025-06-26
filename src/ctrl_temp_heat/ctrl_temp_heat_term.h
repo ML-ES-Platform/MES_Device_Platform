@@ -8,5 +8,7 @@
 
 // Declare any function prototypes here
 void ctrl_temp_heat_report();
+void ctrl_temp_heat_term_cmd(char cmd);
+void ctrl_temp_heat_cmd_help();
 
 #endif // CTRL_TEMP_HEAT_TERM_H

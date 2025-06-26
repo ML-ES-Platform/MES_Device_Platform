@@ -1,5 +1,6 @@
 #include "ctrl_lights_term.h"
 #include "ctrl_lights.h"
+#include "dd_lights/dd_lights.h"
 #include "Arduino.h"
 
 void ctrl_lights_report()
@@ -46,4 +47,76 @@ void ctrl_lights_report()
 
     Serial.println();
 
+}
+
+void ctrl_lights_cmd_help()
+{
+  Serial.println(F("CTRL_LIGHTS: Commands:"));
+  Serial.println(F(" n - Change mode AUTO/MANUAL"));
+  Serial.println(F(" y - Setpoint UP / Lights ON")); 
+  Serial.println(F(" h - Setpoint DOWN / Lights OFF"));
+}
+
+void ctrl_lights_term_cmd(char cmd)
+{
+  Serial.print(F("CTRL_LIGHTS: Received command: "));
+  Serial.println(cmd);
+
+  switch (cmd)
+  {
+    case '?': // help
+      ctrl_lights_cmd_help();
+      break;
+
+    case '`': // report
+      ctrl_lights_report();
+      break;
+
+    case 'n': // Change mode AUTO/MANUAL
+      if (ctrl_lights_is_enabled())
+      { // go to manual control
+        Serial.println(F(" CTRL_LIGHTS:  Change mode to MANUAL"));
+        ctrl_lights_set_mode_manual();
+      }
+      else
+      { // go to automat control
+        Serial.println(F(" CTRL_LIGHTS:  Change mode to AUTO"));
+        ctrl_lights_set_mode_auto();
+      }
+      break;
+
+    case 'y': // Setpoint UP / Lights ON
+      if (ctrl_lights_is_enabled())
+      {
+        ctrl_lights_setpoint_up(0.1);
+        Serial.print(F("CTRL_LIGHTS: Increase Setpoint:"));
+        int sp = ctrl_lights_get_setpoint();
+        Serial.println(sp);
+      }
+      else
+      {
+        dd_lights_on(-1);
+        Serial.println(F("CTRL_LIGHTS: Manual Lights ON"));
+      }
+      break;
+
+    case 'h': // Setpoint DOWN / Lights OFF
+      if (ctrl_lights_is_enabled())
+      {
+        ctrl_lights_setpoint_dn(0.1);
+        Serial.print(F("CTRL_LIGHTS: Decreasing Setpoint:"));
+        int sp = ctrl_lights_get_setpoint();
+        Serial.println(sp);
+      }
+      else
+      {
+        dd_lights_off();
+        Serial.println(F(" DD_LIGHTS: Lights OFF"));
+      }
+      break;
+
+    default:
+      Serial.print(F("CTRL_LIGHTS: Unknown command: "));
+      ctrl_lights_cmd_help();
+  }
 }

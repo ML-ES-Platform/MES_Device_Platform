@@ -93,6 +93,15 @@
 #endif
 #endif
 //-----------------------------------------------------------------------------
+#ifdef USE_CTRL_CAN_STEER
+#ifndef CTRL_CAN_STEER_REC
+#define CTRL_CAN_STEER_REC ((5 * TIME_SEC) / SYS_TICK)
+#endif
+#ifndef CTRL_CAN_STEER_OFFSET
+#define CTRL_CAN_STEER_OFFSET (CTRL_CAN_STEER_REC + 5)
+#endif
+#endif
+//-----------------------------------------------------------------------------
 #ifdef USE_CTRL_WHEEL_STEER
 #ifndef CTRL_WHEEL_STEER_REC
 #define CTRL_WHEEL_STEER_REC (10 / SYS_TICK)
@@ -421,16 +430,16 @@
 //-----------------------------------------------------------------------------
 #ifdef USE_SRV_UI_SERIAL
 #ifndef SRV_UI_SERIAL_IN_REC
-#define SRV_UI_SERIAL_IN_REC (1 )
+#define SRV_UI_SERIAL_IN_REC (1 * TIME_mSEC)
 #endif
 #ifndef SRV_UI_SERIAL_IN_OFFSET
-#define SRV_UI_SERIAL_IN_OFFSET (4)
+#define SRV_UI_SERIAL_IN_OFFSET (4 * TIME_mSEC)
 #endif
 #endif
 //-----------------------------------------------------------------------------
 #ifdef USE_SRV_UI_SERIAL
 #ifndef SRV_UI_SERIAL_OUT_REC
-#define SRV_UI_SERIAL_OUT_REC (2 * TIME_SEC )
+#define SRV_UI_SERIAL_OUT_REC (3 * TIME_SEC )
 #endif
 #ifndef SRV_UI_SERIAL_OUT_OFFSET
 #define SRV_UI_SERIAL_OUT_OFFSET (5 * TIME_mSEC)

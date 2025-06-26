@@ -95,11 +95,11 @@ void ctrl_air_hum_loop()
       // ON OFF Control cu Histereza
       if (hum_current > hum_off)
       {
-        dd_valve_off();
+        dd_valve_off(DD_VALVE_ID_1);
       }
       else if (hum_current < hum_on)
       {
-        dd_valve_on(CTRL_AIR_HUM_OP_D_TIME);
+        dd_valve_on(DD_VALVE_ID_1, CTRL_AIR_HUM_OP_D_TIME);
       }
       else
       {
@@ -108,10 +108,10 @@ void ctrl_air_hum_loop()
     }
     else
     {
-      dd_valve_off();
+      dd_valve_off(DD_VALVE_ID_1);
     }
   }
-  if(dd_valve_get_state() == DD_VALVE_OPEN)
+  if(dd_valve_get_state(DD_VALVE_ID_1) == DD_VALVE_OPEN)
   {
     ctrl_air_hum_output = CTRL_AIR_HUM_OUT_ON;
   }

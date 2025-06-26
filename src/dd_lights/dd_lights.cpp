@@ -3,7 +3,7 @@
 #include "Arduino.h"
 
 int dd_lights_state;
-int dd_lights_relay = ED_RELAY_ID_8;
+int dd_lights_relay = ED_RELAY_ID_7;
 
 int dd_lights_op_cnt = 0;
 

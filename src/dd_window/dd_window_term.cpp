@@ -29,5 +29,49 @@ void dd_window_report()
   }
 }
 
+void dd_window_cmd_help()
+{
+  Serial.println(F("DD_WINDOW: Commands:"));
+  Serial.println(F(" z - Window STOP"));
+  Serial.println(F(" q - Window OPEN"));
+  Serial.println(F(" a - Window CLOSE"));
+  Serial.println();
+}
 
+void dd_window_term_cmd(char cmd)
+{
+  Serial.print(F("DD_WINDOW: Received command: "));
+  Serial.println(cmd);
 
+  switch (cmd)
+  {
+
+  case '?': // help
+    dd_window_cmd_help();
+    break;
+
+  case '`': // report
+    dd_window_report();
+    break;
+
+  case 'z': //  manual or automat control
+    dd_window_stop();
+    Serial.println(F("DD_WINDOW: STOP Command"));
+    break;
+
+  case 'q': // UP
+    dd_window_open(DD_WINDOW_OP_D_TIME);
+    Serial.println(F("DD_WINDOW: Window opening"));
+    break;
+
+  case 'a': // Down
+    dd_window_close(DD_WINDOW_OP_D_TIME);
+    Serial.println(F("DD_WINDOW: Window closing"));
+    break;
+
+  default:
+    Serial.println(F("DD_WINDOW: Unknown command"));
+    dd_window_cmd_help();
+    break;
+  }
+}

@@ -1,0 +1,294 @@
+#include "Arduino.h"
+#include "ctrl_can_steer.h"
+#include "srv_com_can/srv_com_can_signal.h"
+#include "srv_ui_bt/srv_ui_bt.h"
+#include "dd_dc_motor/dd_dc_motor.h"
+#include "ed_encoder/ed_encoder.h"
+#include "ed_l298/ed_l298.h"
+
+#define CTRL_CAN_STEER_ANGLE_MAX (10000)
+#define CTRL_CAN_STEER_ANGLE_MIN (-10000)
+
+
+
+uint8_t ctrl_can_steer_target_mode = CTRL_CAN_STEER_TARGET_MODE;
+uint8_t ctrl_can_steer_fb_mode = CTRL_CAN_STEER_FB_MODE;
+uint8_t ctrl_can_steer_op_mode = CTRL_CAN_STEER_OP_MODE;
+int16_t ctrl_can_steer_target_angle = 0;
+int16_t ctrl_can_steer_current_angle = 0;
+int16_t ctrl_can_steer_power = 0;
+int8_t ctrl_can_steer_enable_state = CTRL_CAN_STEER_MODE;
+
+int16_t ctrl_can_steer_get_power()
+{
+    return ctrl_can_steer_power;
+}
+int16_t ctrl_can_steer_set_power(int16_t power)
+{
+    if (power > DD_DC_MOTOR_MAX_POWER)
+    {
+        power = DD_DC_MOTOR_MAX_POWER;
+    }
+    else if (power < 0)
+    {
+        power = 0;
+    }
+    ctrl_can_steer_power = power;
+    return ctrl_can_steer_power;
+}
+
+int16_t ctrl_can_steer_power_up(int16_t power)
+{
+    power = ctrl_can_steer_get_power() + power;
+    power = ctrl_can_steer_set_power(power);
+    return power;
+}
+
+int16_t ctrl_can_steer_power_down(int16_t power)
+{
+    power = ctrl_can_steer_get_power() - power;
+    power = ctrl_can_steer_set_power(power);
+    return power;
+}
+
+int16_t ctrl_can_steer_get_target_angle()
+{
+    return ctrl_can_steer_target_angle;
+}
+
+int16_t ctrl_can_steer_set_target_angle(int16_t angle)
+{
+    if (angle > CTRL_CAN_STEER_ANGLE_MAX)
+    {
+        angle = CTRL_CAN_STEER_ANGLE_MAX;
+    }
+    else if (angle < CTRL_CAN_STEER_ANGLE_MIN)
+    {
+        angle = CTRL_CAN_STEER_ANGLE_MIN;
+    }
+    ctrl_can_steer_target_angle = angle;
+    return ctrl_can_steer_target_angle;
+}
+int16_t ctrl_can_steer_get_current_angle()
+{
+    return ctrl_can_steer_current_angle;
+}
+int16_t ctrl_can_steer_set_current_angle(int16_t angle)
+{
+    if (angle > CTRL_CAN_STEER_ANGLE_MAX)
+    {
+        angle = CTRL_CAN_STEER_ANGLE_MAX;
+    }
+    else if (angle < CTRL_CAN_STEER_ANGLE_MIN)
+    {
+        angle = CTRL_CAN_STEER_ANGLE_MIN;
+    }
+    ctrl_can_steer_current_angle = angle;
+    return ctrl_can_steer_current_angle;
+}
+
+int16_t ctrl_can_steer_turn_right(int16_t angle)
+{
+    angle = ctrl_can_steer_get_target_angle() + angle;
+    angle = ctrl_can_steer_set_target_angle(angle);
+    return angle;
+}
+int16_t ctrl_can_steer_turn_left(int16_t angle)
+{
+    angle = ctrl_can_steer_get_target_angle() - angle;
+    angle = ctrl_can_steer_set_target_angle(angle);
+    return angle;
+}
+
+int8_t ctrl_can_steer_enable()
+{
+    ctrl_can_steer_enable_state = 1;
+    return ctrl_can_steer_enable_state;
+}
+int8_t ctrl_can_steer_disable()
+{
+    ctrl_can_steer_enable_state = 0;
+    return ctrl_can_steer_enable_state;
+}
+int8_t ctrl_can_steer_is_enabled()
+{
+    return ctrl_can_steer_enable_state;
+}
+
+uint8_t ctrl_can_steer_set_mode(uint8_t mode)
+{
+    ctrl_can_steer_enable_state = mode;
+    return ctrl_can_steer_enable_state;
+}
+
+uint8_t ctrl_can_steer_set_target_mode(uint8_t mode)
+{
+    ctrl_can_steer_target_mode = mode;
+    return ctrl_can_steer_target_mode;
+}
+uint8_t ctrl_can_steer_get_target_mode()
+{
+    return ctrl_can_steer_target_mode;
+}
+uint8_t ctrl_can_steer_set_fb_mode(uint8_t mode)
+{
+    ctrl_can_steer_fb_mode = mode;
+    return ctrl_can_steer_fb_mode;
+}
+uint8_t ctrl_can_steer_get_fb_mode()
+{
+    return ctrl_can_steer_fb_mode;
+}
+
+void ctrl_can_steer_setup()
+{
+    ctrl_can_steer_set_target_angle(0);
+    ctrl_can_steer_set_current_angle(0);
+
+    ctrl_can_steer_set_mode(CTRL_CAN_STEER_MODE);
+    ctrl_can_steer_set_target_mode(CTRL_CAN_STEER_TARGET_MODE);
+    ctrl_can_steer_set_fb_mode(CTRL_CAN_STEER_FB_MODE);
+    ctrl_can_steer_set_power(CTRL_CAN_STEER_POWER);
+}
+
+
+
+
+
+
+
+
+// Speed: -1000~ +1000 corresponds to negative rated speed~ rated speed
+// Position: - 2147483648 ~ +2147483647 (10000/circle)
+// Speed control: 23 00 20 01 DATA_L(H) DATA_L(L) DATA_H(H) DATA_H(L)
+
+// Speed control: 23 00 20 01 03 E8 00 00 Speed 100RPM (0x03E8=1000)
+// Returned ID: 0x0580000 + motor ID (hexadecimal)
+// Data: 60 00 20 00 00 00 00 00
+// Position control: 23 02 20 01 DATA_L(H) DATA_L(L) DATA_H(H) DATA_H(L)
+// Position control: 23 02 20 01 27 10 00 00 Rotate 360°counterclockwise
+// Returned ID: 0x0580000+ motor ID (hexadecimal)
+// Data: 60 02 20 00 00 00 00 00
+// #define CAN_MSG_ENABLE {0x23, 0x0D, 0x20, 0x01, 0x00, 0x00, 0x00, 0x00}
+
+
+#define CAN_MSG_Enable   {0x23, 0x0D, 0x20, 0x01, 0x00, 0x00, 0x00, 0x00}
+#define CAN_MSG_Disable  {0x23, 0x0C, 0x20, 0x01, 0x00, 0x00, 0x00, 0x00}
+#define CAN_MSG_Speed    {0x23, 0x00, 0x20, 0x01, 0x00, 0x00, 0x00, 0x00}
+#define CAN_MSG_Position {0x23, 0x02, 0x20, 0x01, 0x00, 0x00, 0x00, 0x00}
+
+uint8_t ctrl_can_steer_can_msg_enable[8]   = CAN_MSG_Enable ;
+uint8_t ctrl_can_steer_can_msg_disable[8]  = CAN_MSG_Disable ;
+uint8_t ctrl_can_steer_can_msg_speed[8]    = CAN_MSG_Speed ;
+uint8_t ctrl_can_steer_can_msg_position[8] = CAN_MSG_Position;
+
+void ctrl_can_steer_loop()
+{
+
+    int in_angle = analogRead(A1);
+
+    uint32_t out_angle = map(in_angle, 0, 1024, -10000, 10000);
+
+    uint16_t out_angle_L = out_angle;
+    uint16_t out_angle_H = out_angle>>16;
+
+    uint8_t out_angle_L_L = out_angle_L;
+    uint8_t out_angle_L_H = out_angle_L >> 8;
+
+    uint8_t out_angle_H_L = out_angle_H;
+    uint8_t out_angle_H_H = out_angle_H >> 8;
+
+
+    
+    can_message_t *tx_buff = dd_can_matrix_get_msg_ref(CAN_ID_STEER_SEND);
+    // Serial.print(F("ID:"));
+    // Serial.println(tx_buff->id);
+    if (tx_buff != NULL) {
+        tx_buff->tx_msg[0] = ctrl_can_steer_can_msg_position[0];
+        tx_buff->tx_msg[1] = ctrl_can_steer_can_msg_position[1];
+        tx_buff->tx_msg[2] = ctrl_can_steer_can_msg_position[2];
+        tx_buff->tx_msg[3] = ctrl_can_steer_can_msg_position[3];
+        tx_buff->tx_msg[4] = out_angle_L_H; // DATA_L(H)
+        tx_buff->tx_msg[5] = out_angle_L_L; // DATA_L(H)
+        tx_buff->tx_msg[6] = out_angle_H_H; // DATA_L(H)
+        tx_buff->tx_msg[7] = out_angle_H_L; // DATA_L(H)
+
+    } else {
+        Serial.print(F("CAN_ID_STEER_SEND: tx_buff is NULL , tx_ID:"));
+        Serial.println(CAN_ID_STEER_SEND,HEX);
+    }
+
+    // int16_t target_angle;
+    // int16_t current_angle;
+
+    // int16_t steering_power;
+    // steering_power = ctrl_can_steer_get_power();
+
+
+    // if (ctrl_can_steer_is_enabled())
+    // {
+    //     if (ctrl_can_steer_fb_mode == CTRL_CAN_STEER_FB_MODE_ENCODER)
+    //     {
+    //         current_angle = ed_encoder_get_counter();
+    //         ctrl_can_steer_current_angle = current_angle;
+    //     }
+    //     // else if(ctrl_can_steer_fb_mode == CTRL_CAN_STEER_FB_MODE_POTENTIOMETER)
+    //     // {
+    //     //     current_angle = dd_can_signal_get_potentiometer_steering() * 2;
+    //     //     ctrl_can_steer_current_angle = current_angle;
+    //     // }
+    //     else if (ctrl_can_steer_fb_mode == CTRL_CAN_STEER_FB_MODE_TIMER)
+    //     {
+    //         if (ctrl_can_steer_current_angle > ctrl_can_steer_target_angle)
+    //         {
+    //             ctrl_can_steer_current_angle--;
+    //         }
+    //         else if (ctrl_can_steer_current_angle < ctrl_can_steer_target_angle)
+    //         {
+    //             ctrl_can_steer_current_angle++;
+    //         }
+    //         else
+    //         {
+    //             ctrl_can_steer_current_angle = ctrl_can_steer_target_angle;
+    //         }
+    //     }
+
+    //     current_angle = ctrl_can_steer_current_angle;
+    //     ctrl_can_steer_set_current_angle(current_angle);
+
+    //     if (ctrl_can_steer_target_mode == CTRL_CAN_STEER_TARGET_MODE_CAN)
+    //     {
+    //         target_angle = dd_can_signal_get_bt_ui_steering();
+    //         ctrl_can_steer_set_target_angle(target_angle);
+    //     }
+    //     else if (ctrl_can_steer_target_mode == CTRL_CAN_STEER_TARGET_MODE_BT)
+    //     {
+    //         target_angle = srv_ui_bt_get_steering();
+    //         ctrl_can_steer_set_target_angle(target_angle);
+    //     }
+    //     else if (ctrl_can_steer_target_mode == CTRL_CAN_STEER_TARGET_MODE_MANUAL)
+    //     {
+    //         target_angle = ctrl_can_steer_get_target_angle();
+    //     }
+
+    //     ctrl_can_steer_set_target_angle(target_angle);
+
+    //     if (target_angle > current_angle)
+    //     {
+    //         dd_dc_motor_set_power(DD_DC_MOTOR_ID_1, ctrl_can_steer_power);
+    //     }
+    //     else if (target_angle < current_angle)
+    //     {
+    //         dd_dc_motor_set_power(DD_DC_MOTOR_ID_1, -ctrl_can_steer_power);
+    //     }
+    //     else
+    //     {
+    //         dd_dc_motor_set_power(DD_DC_MOTOR_ID_1, 0);
+    //     }
+    // }
+    // else
+    // {
+    //     dd_dc_motor_set_power(DD_DC_MOTOR_ID_2, 0);// check this
+    // }
+
+}

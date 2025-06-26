@@ -8,5 +8,7 @@
 
 // Declare any function prototypes
 void dd_air_pump_report();
+void dd_air_pump_cmd_help();
+void dd_air_pump_term_cmd(char cmd);
 
 #endif // DD_AIR_PUMP_TERM_H

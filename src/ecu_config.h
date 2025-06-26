@@ -10,8 +10,13 @@
 #define TIME_HOUR (60 * TIME_MIN)
 #define TIME_DAY (24 * TIMTIME_HOURE_MIN)
 
+//=============================================================================
+// posible configurations for ECU
 
 #define ECU_ALL 0
+
+//------------------------------------------------
+// Greeenhouse configuration
 #define ECU_CTRL_TEMP_VENT 1
 #define ECU_CTRL_TEMP_HEAT 2
 #define ECU_CTRL_AIR_HUM 3
@@ -20,8 +25,10 @@
 #define ECU_CTRL_LIGHT 6
 
 
+
 #define ECU_TST 7
-// Vehicle set
+//------------------------------------------------
+// Vehicle ECU COnfiguration set
 #define ECU_UI_LCD 8
 #define ECU_UI_BLUETOOTH 9
 #define ECU_STEERING 10
@@ -34,6 +41,9 @@
 
 #define ECU_HEARTBEAT 999
 #define ECU_CTRL_NONE 1000
+
+#define ECU_STATUS_ON 1
+#define ECU_STATUS_OFF 0
 
 
 
@@ -62,7 +72,7 @@
 
 //==============================================================================
 // Select configuration for ECU HERE !!
-#define ECU_CONFIG ECU_STEER_HB  // <--- HERE
+#define ECU_CONFIG ECU_CTRL_TEMP_VENT  // <--- HERE
 //==============================================================================
 
 #if ECU_CONFIG == ECU_ALL

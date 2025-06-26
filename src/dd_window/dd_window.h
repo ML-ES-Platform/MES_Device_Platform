@@ -1,6 +1,9 @@
 #ifndef DD_WINDOW_H_
 #define DD_WINDOW_H_
 
+#include "ecu_config.h"
+
+
 #include "stdint.h"
 
 enum dd_windoe_state_t{
@@ -9,6 +12,14 @@ enum dd_windoe_state_t{
     DD_WINDOW_OPEN,
     DD_WINDOW_UNKNOWN = -1
 };
+
+#ifndef DD_WINDOW_REC
+#define DD_WINDOW_REC (100 ) 
+#endif
+
+#ifndef DD_WINDOW_OP_D_TIME
+#define DD_WINDOW_OP_D_TIME (4.0 * TIME_SEC / DD_WINDOW_REC)
+#endif
 
 void dd_window_setup();
 void dd_window_loop();

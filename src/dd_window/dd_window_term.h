@@ -8,5 +8,7 @@
 
 // Declare function prototypes
 void dd_window_report();
+void dd_window_term_cmd(char cmd);
+void dd_window_cmd_help();
 
 #endif // DD_WINDOW_TERM_H
