@@ -5,14 +5,21 @@
 #include "srv_com_mqtt.h"
 
 #ifndef ESP32
-void srv_com_mqtt_setup(){}
-void srv_com_mqtt_loop(){}
+void srv_com_mqtt_setup() {}
+void srv_com_mqtt_loop() {}
 #else
+
 #include <WiFi.h>
 #include <PubSubClient.h>
 #include <WiFiClientSecure.h>
 #include <ArduinoJson.h>
+#endif
 
+#ifdef USE_CTRL_AIR_HUM
+#include "ctrl_air_hum/ctrl_air_hum_mqtt.h"
+#endif
+void ctrl_air_hum_mqtt_publish(DynamicJsonDocument doc);
+void ctrl_air_hum_mqtt_callback(char *topic, byte *payload, unsigned int length);
 
 // https://github.com/knolleary/pubsubclient/issues/284
 
@@ -23,17 +30,19 @@ void publishMessage(int data);
 void setupMQTT();
 void reconnect();
 
-void ctrl_temp_vent_mqtt_callback(char *topic, byte *payload, unsigned int length);
-void ctrl_temp_heat_mqtt_callback(char *topic, byte *payload, unsigned int length);
 void ctrl_air_hum_mqtt_callback(char *topic, byte *payload, unsigned int length);
+void ctrl_air_press_mqtt_callback(char *topic, byte *payload, unsigned int length);
+void ctrl_air_temp_heat_mqtt_callback(char *topic, byte *payload, unsigned int length);
+void ctrl_air_temp_vent_mqtt_callback(char *topic, byte *payload, unsigned int length);
+void ctrl_amb_light_mqtt_callback(char *topic, byte *payload, unsigned int length);
+void ctrl_soil_moist_mqtt_callback(char *topic, byte *payload, unsigned int length);
 
-
-void ctrl_temp_vent_mqtt_publish();
-void ctrl_temp_heat_mqtt_publish();
-void ctrl_air_hum_mqtt_publish();
-void ctrl_soil_moist_mqtt_publish();
-void ctrl_air_press_mqtt_publish();
-void ctrl_lights_mqtt_publish();
+void ctrl_air_hum_mqtt_publish(DynamicJsonDocument doc);
+void ctrl_air_press_mqtt_publish(DynamicJsonDocument doc);
+void ctrl_air_temp_vent_mqtt_publish(DynamicJsonDocument doc);
+void ctrl_air_temp_heat_mqtt_publish(DynamicJsonDocument doc);
+void ctrl_amb_light_mqtt_publish(DynamicJsonDocument doc);
+void ctrl_soil_moist_mqtt_publish(DynamicJsonDocument doc);
 
 #include "iot_crt.h"
 
@@ -48,7 +57,7 @@ void ctrl_lights_mqtt_publish();
 const char SSID[] = "FabLab-FREE";
 const char PWD[] = "";
 // MQTT Broker
-DynamicJsonDocument doc(1024);
+DynamicJsonDocument doc_out(1024);
 DynamicJsonDocument doc_in(1024);
 WiFiClientSecure wifiClient;
 PubSubClient mqttClient(wifiClient);
@@ -77,31 +86,34 @@ void srv_com_mqtt_loop()
 
   if (!mqttClient.connected())
     reconnect();
+
   mqttClient.loop();
 
-#ifdef USE_CTRL_TEMP_VENT
-  ctrl_temp_vent_mqtt_publish();
-#endif
-
-#ifdef USE_CTRL_TEMP_HEAT
-  ctrl_temp_heat_mqtt_publish();
-#endif
-
 #ifdef USE_CTRL_AIR_HUM
-  ctrl_air_hum_mqtt_publish();
-#endif
-
-#ifdef USE_CTRL_SOIL_MOIST
-  ctrl_soil_moist_mqtt_publish();
+  ctrl_air_hum_mqtt_publish(doc_out);
 #endif
 
 #ifdef USE_CTRL_AIR_PRESS
-  ctrl_air_press_mqtt_publish();
+  ctrl_air_press_mqtt_publish(doc_out);
 #endif
 
-#ifdef USE_CTRL_LIGHTS
-  ctrl_lights_mqtt_publish();
+#ifdef USE_CTRL_AIR_TEMP_HEAT
+  ctrl_air_temp_heat_mqtt_publish(doc_out);
 #endif
+
+#ifdef USE_CTRL_AIR_TEMP_VENT
+  ctrl_air_temp_vent_mqtt_publish(doc_out);
+#endif
+
+#ifdef USE_CTRL_AMB_LIGHT
+  ctrl_amb_light_mqtt_publish(doc_out);
+#endif
+
+#ifdef USE_CTRL_SOIL_MOIST
+  ctrl_soil_moist_mqtt_publish(doc_out);
+#endif
+
+
 }
 
 void connectToWiFi()
@@ -137,47 +149,24 @@ void callback(char *topic, byte *payload, unsigned int length)
   }
 
   Serial.println();
-  
 
-#ifdef USE_CTRL_TEMP_VENT
-ctrl_temp_vent_mqtt_callback(topic, payload, length);
-#endif
-#ifdef USE_CTRL_TEMP_HEAT
-ctrl_temp_heat_mqtt_callback(topic, payload, length);
-#endif
 #ifdef USE_CTRL_AIR_HUM
-ctrl_air_hum_mqtt_callback(topic, payload, length);
+  ctrl_air_hum_mqtt_callback(topic, payload, length);
 #endif
-
+#ifdef USE_CTRL_AIR_PRESS
+  ctrl_air_press_mqtt_callback(topic, payload, length);
+#endif
+#ifdef USE_CTRL_AIR_TEMP_HEAT
+  ctrl_air_temp_heat_mqtt_callback(topic, payload, length);
+#endif
+#ifdef USE_CTRL_AIR_TEMP_VENT
+  ctrl_air_temp_vent_mqtt_callback(topic, payload, length);
+#endif
+#ifdef USE_CTRL_AMB_LIGHT
+  ctrl_amb_light_mqtt_callback(topic, payload, length);
+#endif
 #ifdef USE_CTRL_SOIL_MOIST
-  if (strcmp(cmd, "set_point") == 0)
-  {
-    ctrl_soil_moist_set_setpoint(value_f);
-  }
-  else if (strcmp(cmd, "ctrl_mode") == 0)
-  {
-    int mode = value_f;
-    if (mode == CTRL_SOIL_MOIST_DISABLE)
-    {
-      ctrl_soil_moist_set_mode_manual();
-    }
-    else if (mode == CTRL_SOIL_MOIST_ENABLE)
-    {
-      ctrl_soil_moist_set_mode_auto();
-    }
-  }
-  else if (strcmp(cmd, "ctrl_out") == 0)
-  {
-    int out = value_f;
-    if (out == CTRL_SOIL_MOIST_OUT_OFF)
-    {
-      dd_valve_off();
-    }
-    else if (out == CTRL_SOIL_MOIST_OUT_ON)
-    {
-      dd_valve_on(CTRL_SOIL_MOIST_OP_D_TIME);
-    }
-  }
+  ctrl_soil_moist_mqtt_callback(topic, payload, length);
 #endif
 
   Serial.println();
@@ -197,23 +186,24 @@ void reconnect()
     if (mqttClient.connect(clientId.c_str(), mqtt_username, mqtt_password))
     {
       Serial.println(F("Connected to MQTT broker."));
+
 // subscribe to topic
-#ifdef USE_CTRL_TEMP_VENT
-      mqttClient.subscribe("microlab/agro/green_house/temp_vent_ctrl/set");
-#endif
-#ifdef USE_CTRL_TEMP_HEAT
-      mqttClient.subscribe("microlab/agro/green_house/temp_heat_ctrl/set");
-#endif
 #ifdef USE_CTRL_AIR_HUM
       mqttClient.subscribe("microlab/agro/green_house/air_hum_ctrl/set");
-#endif
-#ifdef USE_CTRL_SOIL_MOIST
-      mqttClient.subscribe("microlab/agro/green_house/soil_moist_ctrl/set");
 #endif
 #ifdef USE_CTRL_AIR_PRESS
       mqttClient.subscribe("microlab/agro/green_house/air_press_ctrl/set");
 #endif
-#ifdef USE_CTRL_LIGHTS
+#ifdef USE_CTRL_AIR_TEMP_VENT
+      mqttClient.subscribe("microlab/agro/green_house/temp_vent_ctrl/set");
+#endif
+#ifdef USE_CTRL_AIR_TEMP_HEAT
+      mqttClient.subscribe("microlab/agro/green_house/temp_heat_ctrl/set");
+#endif
+#ifdef USE_CTRL_SOIL_MOIST
+      mqttClient.subscribe("microlab/agro/green_house/soil_moist_ctrl/set");
+#endif
+#ifdef USE_CTRL_AMB_LIGHT
       mqttClient.subscribe("microlab/agro/green_house/light_ctrl/set");
 #endif
     }
@@ -229,142 +219,10 @@ void publishMessage(int data)
 //==========================================================
 
 //----------------------------------------------------------
-// Temperature Control by Ventilation MQTT Callback
-void ctrl_temp_vent_mqtt_callback(char *topic, byte *payload, unsigned int length)
-{
-#ifdef USE_CTRL_TEMP_VENT
-
-  Serial.println();
-
-  Serial.println(F("SRV_COM_MQTT: ctrl_temp_vent_mqtt_callback"));
-
-  deserializeJson(doc_in, (const byte *)payload, length);
-
-  char cmd[32];
-  strlcpy(cmd, doc_in["cmd"] | "default", sizeof(cmd));
-
-  Serial.print(F("Command:"));
-  Serial.println(cmd);
-
-  char value[32];
-  strlcpy(value, doc_in["value"] | "default", sizeof(value));
-
-  Serial.print(F("Value:"));
-  Serial.println(value);
-
-  float value_f = atof(value);
-  Serial.print(F("Value_f:"));
-  Serial.println(value_f);
-
-  // subscribe message example
-  // {
-  // "cmd":"set_point",
-  // "value":"17.3"
-  // }
-
-  if (strcmp(cmd, "set_point") == 0)
-  {
-    ctrl_temp_vent_set_setpoint(value_f);
-  }
-  else if (strcmp(cmd, "ctrl_mode") == 0)
-  {
-    int mode = value_f;
-    if (mode == CTRL_TEMP_VENT_DISABLE)
-    {
-      ctrl_temp_vent_set_mode_manual();
-    }
-    else if (mode == CTRL_TEMP_VENT_ENABLE)
-    {
-      ctrl_temp_vent_set_mode_auto();
-    }
-  }
-  else if (strcmp(cmd, "ctrl_out") == 0)
-  {
-    int out = value_f;
-    if (out == CTRL_TEMP_VENT_OUT_OPEN)
-    {
-      dd_window_open(10);
-    }
-    else if (out == CTRL_TEMP_VENT_OUT_CLOSE)
-    {
-      dd_window_close(10);
-    }
-    else if (out == CTRL_TEMP_VENT_OUT_STOP)
-    {
-      dd_window_stop();
-    }
-  }
-#endif
-}
-//----------------------------------------------------------
-// Temperature Control by Heating MQTT Callback
-void ctrl_temp_heat_mqtt_callback(char *topic, byte *payload, unsigned int length){
-#ifdef USE_CTRL_TEMP_HEAT
-
-  Serial.println();
-
-  Serial.println(F("SRV_COM_MQTT: ctrl_temp_heat_mqtt_callback"));
-
-  deserializeJson(doc_in, (const byte *)payload, length);
-
-  char cmd[32];
-  strlcpy(cmd, doc_in["cmd"] | "default", sizeof(cmd));
-
-  Serial.print(F("Command:"));
-  Serial.println(cmd);
-
-  char value[32];
-  strlcpy(value, doc_in["value"] | "default", sizeof(value));
-
-  Serial.print(F("Value:"));
-  Serial.println(value);
-
-  float value_f = atof(value);
-  Serial.print(F("Value_f:"));
-  Serial.println(value_f);
-
-  // subscribe message example
-  // {
-  // "cmd":"set_point",
-  // "value":"17.3"
-  // }
-
-  if (strcmp(cmd, "set_point") == 0)
-  {
-    ctrl_temp_heat_set_setpoint(value_f);
-  }
-  else if (strcmp(cmd, "ctrl_mode") == 0)
-  {
-    int mode = value_f;
-    if (mode == CTRL_TEMP_HEAT_DISABLE)
-    {
-      ctrl_temp_heat_set_mode_manual();
-    }
-    else if (mode == CTRL_TEMP_HEAT_ENABLE)
-    {
-      ctrl_temp_heat_set_mode_auto();
-    }
-  }
-  else if (strcmp(cmd, "ctrl_out") == 0)
-  {
-    int out = value_f;
-    if (out == CTRL_TEMP_HEAT_OUT_OFF)
-    {
-      dd_heater_off();
-    }
-    else if (out == CTRL_TEMP_HEAT_OUT_ON)
-    {
-      dd_heater_on();
-    }
-  }
-  #endif
-}
-
-//----------------------------------------------------------
 // Air Humidity Control MQTT Callback
 void ctrl_air_hum_mqtt_callback(char *topic, byte *payload, unsigned int length)
 {
-  #ifdef USE_CTRL_AIR_HUM
+#ifdef USE_CTRL_AIR_HUM
 
   Serial.println();
 
@@ -394,7 +252,6 @@ void ctrl_air_hum_mqtt_callback(char *topic, byte *payload, unsigned int length)
   // "value":"17.3"
   // }
 
-
   if (strcmp(cmd, "set_point") == 0)
   {
     ctrl_air_hum_set_setpoint(value_f);
@@ -416,25 +273,355 @@ void ctrl_air_hum_mqtt_callback(char *topic, byte *payload, unsigned int length)
     int out = value_f;
     if (out == CTRL_AIR_HUM_OUT_OFF)
     {
-      dd_valve_off();
+      dd_valve_off(DD_VALVE_AIR_HUM_ID);
     }
     else if (out == CTRL_AIR_HUM_OUT_ON)
     {
-      dd_valve_on(CTRL_AIR_HUM_OP_D_TIME);
+      dd_valve_on(DD_VALVE_AIR_HUM_ID, CTRL_AIR_HUM_OP_D_TIME);
     }
   }
-  #endif
+#endif
+}
+
+//----------------------------------------------------------
+// Air Pressure Control MQTT Callback
+void ctrl_air_press_mqtt_callback(char *topic, byte *payload, unsigned int length)
+{
+#ifdef USE_CTRL_AIR_PRESS
+
+  Serial.println();
+
+  Serial.println(F("SRV_COM_MQTT: ctrl_air_press_mqtt_callback"));
+
+  deserializeJson(doc_in, (const byte *)payload, length);
+
+  char cmd[32];
+  strlcpy(cmd, doc_in["cmd"] | "default", sizeof(cmd));
+
+  Serial.print(F("Command:"));
+  Serial.println(cmd);
+
+  char value[32];
+  strlcpy(value, doc_in["value"] | "default", sizeof(value));
+
+  Serial.print(F("Value:"));
+  Serial.println(value);
+
+  float value_f = atof(value);
+  Serial.print(F("Value_f:"));
+  Serial.println(value_f);
+
+  // subscribe message example
+  // {
+  // "cmd":"set_point",
+  // "value":"17.3"
+  // }
+
+  if (strcmp(cmd, "set_point") == 0)
+  {
+    ctrl_air_press_set_setpoint(value_f);
+  }
+  else if (strcmp(cmd, "ctrl_mode") == 0)
+  {
+    int mode = value_f;
+    if (mode == CTRL_AIR_PRESS_DISABLE)
+    {
+      ctrl_air_press_set_mode_manual();
+    }
+    else if (mode == CTRL_AIR_PRESS_ENABLE)
+    {
+      ctrl_air_press_set_mode_auto();
+    }
+  }
+  else if (strcmp(cmd, "ctrl_out") == 0)
+  {
+    int out = value_f;
+    if (out == CTRL_AIR_PRESS_OUT_OFF)
+    {
+      dd_valve_off(DD_VALVE_AIR_HUM_ID);
+    }
+    else if (out == CTRL_AIR_PRESS_OUT_ON)
+    {
+      dd_valve_on(DD_VALVE_AIR_HUM_ID, CTRL_AIR_PRESS_OP_D_TIME);
+    }
+  }
+#endif
+}
+
+
+//----------------------------------------------------------
+// Temperature Control by Heating MQTT Callback
+void ctrl_air_temp_heat_mqtt_callback(char *topic, byte *payload, unsigned int length)
+{
+#ifdef USE_CTRL_AIR_TEMP_HEAT
+
+  Serial.println();
+
+  Serial.println(F("SRV_COM_MQTT: ctrl_air_temp_heat_mqtt_callback"));
+
+  deserializeJson(doc_in, (const byte *)payload, length);
+
+  char cmd[32];
+  strlcpy(cmd, doc_in["cmd"] | "default", sizeof(cmd));
+
+  Serial.print(F("Command:"));
+  Serial.println(cmd);
+
+  char value[32];
+  strlcpy(value, doc_in["value"] | "default", sizeof(value));
+
+  Serial.print(F("Value:"));
+  Serial.println(value);
+
+  float value_f = atof(value);
+  Serial.print(F("Value_f:"));
+  Serial.println(value_f);
+
+  // subscribe message example
+  // {
+  // "cmd":"set_point",
+  // "value":"17.3"
+  // }
+
+  if (strcmp(cmd, "set_point") == 0)
+  {
+    ctrl_air_temp_heat_set_setpoint(value_f);
+  }
+  else if (strcmp(cmd, "ctrl_mode") == 0)
+  {
+    int mode = value_f;
+    if (mode == CTRL_AIR_TEMP_HEAT_DISABLE)
+    {
+      ctrl_air_temp_heat_set_mode_manual();
+    }
+    else if (mode == CTRL_AIR_TEMP_HEAT_ENABLE)
+    {
+      ctrl_air_temp_heat_set_mode_auto();
+    }
+  }
+  else if (strcmp(cmd, "ctrl_out") == 0)
+  {
+    int out = value_f;
+    if (out == CTRL_AIR_TEMP_HEAT_OUT_OFF)
+    {
+      dd_heater_off();
+    }
+    else if (out == CTRL_AIR_TEMP_HEAT_OUT_ON)
+    {
+      dd_heater_on(CTRL_AIR_TEMP_HEAT_OP_D_TIME);
+    }
+  }
+#endif
+}
+
+//----------------------------------------------------------
+// Temperature Control by Ventilation MQTT Callback
+void ctrl_air_temp_vent_mqtt_callback(char *topic, byte *payload, unsigned int length)
+{
+#ifdef USE_CTRL_AIR_TEMP_VENT
+
+  Serial.println();
+
+  Serial.println(F("SRV_COM_MQTT: ctrl_air_temp_vent_mqtt_callback"));
+
+  deserializeJson(doc_in, (const byte *)payload, length);
+
+  char cmd[32];
+  strlcpy(cmd, doc_in["cmd"] | "default", sizeof(cmd));
+
+  Serial.print(F("Command:"));
+  Serial.println(cmd);
+
+  char value[32];
+  strlcpy(value, doc_in["value"] | "default", sizeof(value));
+
+  Serial.print(F("Value:"));
+  Serial.println(value);
+
+  float value_f = atof(value);
+  Serial.print(F("Value_f:"));
+  Serial.println(value_f);
+
+  // subscribe message example
+  // {
+  // "cmd":"set_point",
+  // "value":"17.3"
+  // }
+
+  if (strcmp(cmd, "set_point") == 0)
+  {
+    ctrl_air_temp_vent_set_setpoint(value_f);
+  }
+  else if (strcmp(cmd, "ctrl_mode") == 0)
+  {
+    int mode = value_f;
+    if (mode == CTRL_AIR_TEMP_VENT_DISABLE)
+    {
+      ctrl_air_temp_vent_set_mode_manual();
+    }
+    else if (mode == CTRL_AIR_TEMP_VENT_ENABLE)
+    {
+      ctrl_air_temp_vent_set_mode_auto();
+    }
+  }
+  else if (strcmp(cmd, "ctrl_out") == 0)
+  {
+    int out = value_f;
+    if (out == CTRL_AIR_TEMP_VENT_OUT_OPEN)
+    {
+      dd_window_open(CTRL_AIR_TEMP_HEAT_OP_D_TIME);
+    }
+    else if (out == CTRL_AIR_TEMP_VENT_OUT_CLOSE)
+    {
+      dd_window_close(CTRL_AIR_TEMP_HEAT_OP_D_TIME);
+    }
+    else if (out == CTRL_AIR_TEMP_VENT_OUT_STOP)
+    {
+      dd_window_stop();
+    }
+  }
+#endif
+}
+
+//----------------------------------------------------------
+// Ambient Light Control MQTT Callback
+void ctrl_amb_light_mqtt_callback(char *topic, byte *payload, unsigned int length)
+{
+#ifdef USE_CTRL_AMB_LIGHT
+
+  Serial.println();
+
+  Serial.println(F("SRV_COM_MQTT: ctrl_amb_light_mqtt_callback"));
+
+  deserializeJson(doc_in, (const byte *)payload, length);
+
+  char cmd[32];
+  strlcpy(cmd, doc_in["cmd"] | "default", sizeof(cmd));
+
+  Serial.print(F("Command:"));
+  Serial.println(cmd);
+
+  char value[32];
+  strlcpy(value, doc_in["value"] | "default", sizeof(value));
+
+  Serial.print(F("Value:"));
+  Serial.println(value);
+
+  float value_f = atof(value);
+  Serial.print(F("Value_f:"));
+  Serial.println(value_f);
+
+  // subscribe message example
+  // {
+  // "cmd":"set_point",
+  // "value":"17.3"
+  // }
+
+  if (strcmp(cmd, "set_point") == 0)
+  {
+    ctrl_amb_light_set_setpoint(value_f);
+  }
+  else if (strcmp(cmd, "ctrl_mode") == 0)
+  {
+    int mode = value_f;
+    if (mode == CTRL_AMB_LIGHT_DISABLE)
+    {
+      ctrl_amb_light_set_mode_manual();
+    }
+    else if (mode == CTRL_AMB_LIGHT_ENABLE)
+    {
+      ctrl_amb_light_set_mode_auto();
+    }
+  }
+  else if (strcmp(cmd, "ctrl_out") == 0)
+  {
+    int out = value_f;
+    if (out == CTRL_AMB_LIGHT_OUT_OFF)
+    {
+      dd_lights_off();
+    }
+    else if (out == CTRL_AMB_LIGHT_OUT_ON)
+    {
+      dd_lights_on(-1);
+    }
+  }
+
+}
+//----------------------------------------------------------
+// Soil Moisture Control MQTT Callback
+void ctrl_soil_moist_mqtt_callback(char *topic, byte *payload, unsigned int length)
+{
+#ifdef USE_CTRL_SOIL_MOIST
+
+  Serial.println();
+
+  Serial.println(F("SRV_COM_MQTT: ctrl_air_hum_mqtt_callback"));
+
+  deserializeJson(doc_in, (const byte *)payload, length);
+
+  char cmd[32];
+  strlcpy(cmd, doc_in["cmd"] | "default", sizeof(cmd));
+
+  Serial.print(F("Command:"));
+  Serial.println(cmd);
+
+  char value[32];
+  strlcpy(value, doc_in["value"] | "default", sizeof(value));
+
+  Serial.print(F("Value:"));
+  Serial.println(value);
+
+  float value_f = atof(value);
+  Serial.print(F("Value_f:"));
+  Serial.println(value_f);
+
+  // subscribe message example
+  // {
+  // "cmd":"set_point",
+  // "value":"17.3"
+  // }
+
+  if (strcmp(cmd, "set_point") == 0)
+  {
+    ctrl_soil_moist_set_setpoint(value_f);
+  }
+  else if (strcmp(cmd, "ctrl_mode") == 0)
+  {
+    int mode = value_f;
+    if (mode == CTRL_SOIL_MOIST_DISABLE)
+    {
+      ctrl_soil_moist_set_mode_manual();
+    }
+    else if (mode == CTRL_SOIL_MOIST_ENABLE)
+    {
+      ctrl_soil_moist_set_mode_auto();
+    }
+  }
+  else if (strcmp(cmd, "ctrl_out") == 0)
+  {
+    int out = value_f;
+    if (out == CTRL_SOIL_MOIST_OUT_OFF)
+    {
+      dd_valve_off(DD_VALVE_SOIL_MOIST_ID);
+    }
+    else if (out == CTRL_SOIL_MOIST_OUT_ON)
+    {
+      dd_valve_on(DD_VALVE_SOIL_MOIST_ID, CTRL_SOIL_MOIST_OP_D_TIME);
+    }
+  }
+
+#endif
 }
 
 //----------------------------------------------------------
 // Publish Temperature Control by Ventilation Data to MQTT
-void ctrl_temp_vent_mqtt_publish()
+void ctrl_air_temp_vent_mqtt_publish(DynamicJsonDocument doc)
 {
-#ifdef USE_CTRL_TEMP_VENT
-  float temp_ctrl_cur_temp = ctrl_temp_vent_get_current_temp();
-  float temp_ctrl_sp = ctrl_temp_vent_get_setpoint();
-  int temp_ctrl_mode = ctrl_temp_vent_get_mode();
-  int temp_out = ctrl_temp_vent_get_output();
+#ifdef USE_CTRL_AIR_TEMP_VENT
+  float temp_ctrl_cur_temp = ctrl_air_temp_vent_get_current_temp();
+  float temp_ctrl_sp = ctrl_air_temp_vent_get_setpoint();
+  int temp_ctrl_mode = ctrl_air_temp_vent_get_mode();
+  int temp_out = ctrl_air_temp_vent_get_output();
   // JSON mapping
   doc.clear();
   doc["sensor_id"] = 111;
@@ -451,13 +638,13 @@ void ctrl_temp_vent_mqtt_publish()
 }
 //----------------------------------------------------------
 // Publish Temperature Control by Heating Data to MQTT
-void ctrl_temp_heat_mqtt_publish()
+void ctrl_air_temp_heat_mqtt_publish(DynamicJsonDocument doc)
 {
-#ifdef USE_CTRL_TEMP_HEAT
-  float temp_ctrl_cur_temp = ctrl_temp_heat_get_current_temp();
-  float temp_ctrl_sp = ctrl_temp_heat_get_setpoint();
-  int temp_ctrl_mode = ctrl_temp_heat_get_mode();
-  int temp_out = ctrl_temp_heat_get_output();
+#ifdef USE_CTRL_AIR_TEMP_HEAT
+  float temp_ctrl_cur_temp = ctrl_air_temp_heat_get_current_temp();
+  float temp_ctrl_sp = ctrl_air_temp_heat_get_setpoint();
+  int temp_ctrl_mode = ctrl_air_temp_heat_get_mode();
+  int temp_out = ctrl_air_temp_heat_get_output();
   // JSON mapping
   doc.clear();
   doc["sensor_id"] = 222;
@@ -474,7 +661,7 @@ void ctrl_temp_heat_mqtt_publish()
 }
 //----------------------------------------------------------
 // Publish Air Humidity Control Data to MQTT
-void ctrl_air_hum_mqtt_publish()
+void ctrl_air_hum_mqtt_publish(DynamicJsonDocument doc)
 {
 #ifdef USE_CTRL_AIR_HUM
   float air_hum_ctrl_cur_hum = ctrl_air_hum_get_current_hum();
@@ -498,7 +685,7 @@ void ctrl_air_hum_mqtt_publish()
 
 //----------------------------------------------------------
 // Publish Soil Moisture Control Data to MQTT
-void ctrl_soil_moist_mqtt_publish()
+void ctrl_soil_moist_mqtt_publish(DynamicJsonDocument doc)
 {
 #ifdef USE_CTRL_SOIL_MOIST
   float soil_moist_ctrl_cur_moist = ctrl_soil_moist_get_current_moist();
@@ -522,7 +709,7 @@ void ctrl_soil_moist_mqtt_publish()
 
 //----------------------------------------------------------
 // Publish Pressure Isolation Control Data to MQTT
-void ctrl_air_press_mqtt_publish()
+void ctrl_air_press_mqtt_publish(DynamicJsonDocument doc)
 {
 #ifdef USE_CTRL_AIR_PRESS
   float air_press_ctrl_cur_press = ctrl_air_press_get_current_press();
@@ -546,13 +733,13 @@ void ctrl_air_press_mqtt_publish()
 
 //----------------------------------------------------------
 // Publish Lights Control Data to MQTT
-void ctrl_lights_mqtt_publish()
+void ctrl_amb_light_mqtt_publish(DynamicJsonDocument doc)
 {
-#ifdef USE_CTRL_LIGHTS
-  float light_ctrl_cur_lum = ctrl_lights_get_current_light();
-  float light_ctrl_sp = ctrl_lights_get_setpoint();
-  int light_ctrl_mode = ctrl_lights_get_mode();
-  int light_out = ctrl_lights_get_output();
+#ifdef USE_CTRL_AMB_LIGHT
+  float light_ctrl_cur_lum = ctrl_amb_light_get_current_light();
+  float light_ctrl_sp = ctrl_amb_light_get_setpoint();
+  int light_ctrl_mode = ctrl_amb_light_get_mode();
+  int light_out = ctrl_amb_light_get_output();
   // JSON mapping
   doc.clear();
   doc["sensor_id"] = 666;

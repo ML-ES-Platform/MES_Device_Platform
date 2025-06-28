@@ -16,8 +16,8 @@ int ctrl_air_hum_rec_cnt = CTRL_AIR_HUM_OFFSET;
 int ctrl_air_press_rec_cnt = CTRL_AIR_PRESS_OFFSET;
 #endif
 //-----------------------------------------------------------------------------
-#ifdef USE_CTRL_LIGHTS
-int ctrl_lights_rec_cnt = CTRL_LIGHTS_OFFSET;
+#ifdef USE_CTRL_AMB_LIGHT
+int ctrl_amb_light_rec_cnt = CTRL_AMB_LIGHT_OFFSET;
 #endif
 //-----------------------------------------------------------------------------
 #ifdef USE_CTRL_SERVO_ADC_DC
@@ -28,12 +28,12 @@ int ctrl_servo_adc_dc_rec_cnt = CTRL_SERVO_ADC_DC_OFFSET;
 int ctrl_soil_moist_rec_cnt = CTRL_SOIL_MOIST_OFFSET;
 #endif
 //-----------------------------------------------------------------------------
-#ifdef USE_CTRL_TEMP_HEAT
-int ctrl_temp_heat_rec_cnt = CTRL_TEMP_HEAT_OFFSET;
+#ifdef USE_CTRL_AIR_TEMP_HEAT
+int ctrl_air_temp_heat_rec_cnt = CTRL_AIR_TEMP_HEAT_OFFSET;
 #endif
 //-----------------------------------------------------------------------------
-#ifdef USE_CTRL_TEMP_VENT
-int ctrl_temp_vent_rec_cnt = CTRL_TEMP_VENT_OFFSET;
+#ifdef USE_CTRL_AIR_TEMP_VENT
+int ctrl_air_temp_vent_rec_cnt = CTRL_AIR_TEMP_VENT_OFFSET;
 #endif
 //-----------------------------------------------------------------------------
 #ifdef USE_CTRL_CAN_STEER
@@ -207,8 +207,8 @@ void srv_sys_os_seq_setup()
 #ifdef USE_CTRL_AIR_PRESS
   ctrl_air_press_setup();
 #endif
-#ifdef USE_CTRL_LIGHTS
-  ctrl_lights_setup();
+#ifdef USE_CTRL_AMB_LIGHT
+  ctrl_amb_light_setup();
 #endif
 #ifdef USE_CTRL_SERVO_ADC_DC
   ctrl_servo_adc_dc_setup();
@@ -217,11 +217,11 @@ void srv_sys_os_seq_setup()
   ctrl_soil_moist_setup();
 
 #endif
-#ifdef USE_CTRL_TEMP_HEAT
-  ctrl_temp_heat_setup();
+#ifdef USE_CTRL_AIR_TEMP_HEAT
+  ctrl_air_temp_heat_setup();
 #endif
-#ifdef USE_CTRL_TEMP_VENT
-  ctrl_temp_vent_setup();
+#ifdef USE_CTRL_AIR_TEMP_VENT
+  ctrl_air_temp_vent_setup();
 #endif
 
   // initialize device drivers
@@ -360,12 +360,12 @@ void srv_sys_os_seq_scheduler()
     ctrl_air_press_rec_cnt = CTRL_AIR_PRESS_REC;
   }
 #endif
-#ifdef USE_CTRL_LIGHTS
+#ifdef USE_CTRL_AMB_LIGHT
   // Task for light control
-  if (--ctrl_lights_rec_cnt <= 0)
+  if (--ctrl_amb_light_rec_cnt <= 0)
   {
-    ctrl_lights_loop();
-    ctrl_lights_rec_cnt = CTRL_LIGHTS_REC;
+    ctrl_amb_light_loop();
+    ctrl_amb_light_rec_cnt = CTRL_AMB_LIGHT_REC;
   }
 #endif
 #ifdef USE_CTRL_SERVO_ADC_DC
@@ -383,20 +383,20 @@ void srv_sys_os_seq_scheduler()
     ctrl_soil_moist_rec_cnt = CTRL_SOIL_MOIST_REC;
   }
 #endif
-#ifdef USE_CTRL_TEMP_HEAT
+#ifdef USE_CTRL_AIR_TEMP_HEAT
   // Task for temperature control with heater
-  if (--ctrl_temp_heat_rec_cnt <= 0)
+  if (--ctrl_air_temp_heat_rec_cnt <= 0)
   {
-    ctrl_temp_heat_loop();
-    ctrl_temp_heat_rec_cnt = CTRL_TEMP_HEAT_REC;
+    ctrl_air_temp_heat_loop();
+    ctrl_air_temp_heat_rec_cnt = CTRL_AIR_TEMP_HEAT_REC;
   }
 #endif
-#ifdef USE_CTRL_TEMP_VENT
+#ifdef USE_CTRL_AIR_TEMP_VENT
   // Task for temperature control with ventilation
-  if (--ctrl_temp_vent_rec_cnt <= 0)
+  if (--ctrl_air_temp_vent_rec_cnt <= 0)
   {
-    ctrl_temp_vent_loop();
-    ctrl_temp_vent_rec_cnt = CTRL_TEMP_VENT_REC;
+    ctrl_air_temp_vent_loop();
+    ctrl_air_temp_vent_rec_cnt = CTRL_AIR_TEMP_VENT_REC;
   }
 #endif
 #ifdef USE_CTRL_CAN_STEER

@@ -4,7 +4,7 @@
 #include "ed_relay/ed_relay.h"
 
 int dd_heater_state;
-int dd_heater_relay = ED_RELAY_ID_3;
+int dd_heater_relay = ED_RELAY_HEAT_ID;
 
 int dd_heater_op_cnt = 0;
 
@@ -35,7 +35,7 @@ int dd_heater_off()
 int dd_heater_on(int time)
 {
     int state = dd_heater_set_state( DD_HEATER_ON);
-    dd_heater_op_cnt = time;
+    dd_heater_op_cnt = time/DD_HEATER_REC; // set operation count
     return state;
 }
 

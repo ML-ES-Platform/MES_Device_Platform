@@ -14,7 +14,7 @@
 #endif
 
 #ifndef DD_WATER_PUMP_OP_D_TIME
-#define DD_WATER_PUMP_OP_D_TIME (4 * TIME_SEC / DD_WATER_PUMP_REC)
+#define DD_WATER_PUMP_OP_D_TIME (1.0 * TIME_SEC)
 #endif
 
 

@@ -18,7 +18,7 @@ enum dd_windoe_state_t{
 #endif
 
 #ifndef DD_WINDOW_OP_D_TIME
-#define DD_WINDOW_OP_D_TIME (4.0 * TIME_SEC / DD_WINDOW_REC)
+#define DD_WINDOW_OP_D_TIME (1.0 * TIME_SEC)
 #endif
 
 void dd_window_setup();

@@ -1,10 +1,10 @@
 ctrl_air_hum
 ctrl_air_press
-ctrl_lights
+ctrl_amb_light
 ctrl_servo_adc_dc
 ctrl_soil_moist
-ctrl_temp_heat
-ctrl_temp_vent
+ctrl_air_temp_heat
+ctrl_air_temp_vent
 ctrl_wheel_steer
 ctrl_wheel_tract
 dd_air_pump

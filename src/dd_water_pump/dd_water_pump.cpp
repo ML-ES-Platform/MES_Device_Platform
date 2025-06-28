@@ -3,7 +3,7 @@
 #include "Arduino.h"
 
 int dd_water_pump_state = DD_WATER_PUMP_OFF;
-int dd_water_pump_relay = ED_RELAY_ID_6;
+int dd_water_pump_relay = ED_RELAY_MOIST_ID;
 
 int dd_water_pump_op_cnt = 0;
 
@@ -34,7 +34,7 @@ int dd_water_pump_off()
 int dd_water_pump_on(int time)
 {
     int state = dd_water_pump_set_state(DD_WATER_PUMP_ON);
-    dd_water_pump_op_cnt = time;
+    dd_water_pump_op_cnt = time/DD_WATER_PUMP_REC; // set operation count
     return state;
 }
 

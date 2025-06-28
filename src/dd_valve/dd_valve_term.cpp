@@ -53,11 +53,11 @@ void dd_valve_term_cmd(char cmd)
     break;
 
   case 'r': // UP
-    dd_valve_on( DD_VALVE_ID_1, DD_VALVE_OP_D_TIME);
+    dd_valve_on( DD_VALVE_AIR_HUM_ID, DD_VALVE_OP_D_TIME);
     Serial.println(F("DD_VALVE: Valve opening"));
     break;
   case 'f': // Down
-    dd_valve_off(DD_VALVE_ID_1);
+    dd_valve_off(DD_VALVE_AIR_HUM_ID);
     Serial.println(F("DD_VALVE: Valve closing"));
     break;
   default:

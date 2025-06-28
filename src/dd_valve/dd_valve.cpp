@@ -5,8 +5,8 @@
 int dd_valve_state[DD_VALVE_NR_OF];
 
 int dd_valve_relay[DD_VALVE_NR_OF] = {
-    ED_RELAY_ID_4, // DD_VALVE_ID_4
-    ED_RELAY_ID_5, // DD_VALVE_ID_5
+    ED_RELAY_HUMIDIFY_ID, // DD_VALVE_ID_4
+    ED_RELAY_MOIST_ID, // DD_VALVE_ID_5
 };
 
 int dd_valve_op_cnt[DD_VALVE_NR_OF] ;
@@ -38,7 +38,7 @@ int dd_valve_off(size_t valve_it)
 int dd_valve_on(size_t valve_it, int time)
 {
     int state = dd_valve_set_state(valve_it, DD_VALVE_OPEN);
-    dd_valve_op_cnt[valve_it] = time;
+    dd_valve_op_cnt[valve_it] = time/DD_VALVE_REC; // set operation count
     return state;
 }
 

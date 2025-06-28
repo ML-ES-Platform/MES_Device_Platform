@@ -42,19 +42,19 @@ void ed_relay_term_cmd(char cmd)
     // Window control
     case 'z': // stop
       Serial.println(F("DD_RELAY: STOP Command"));
-      ed_relay_off(ED_RELAY_ID_1);
-      ed_relay_off(ED_RELAY_ID_2);
+      ed_relay_off(ED_RELAY_WIN_POS_TERM_ID);
+      ed_relay_off(ED_RELAY_WIN_NEG_TERM_ID);
       break;
 
     case 'q': // UP
-      ed_relay_on(ED_RELAY_ID_1);
-      ed_relay_off(ED_RELAY_ID_2);
+      ed_relay_on(ED_RELAY_WIN_POS_TERM_ID);
+      ed_relay_off(ED_RELAY_WIN_NEG_TERM_ID);
       Serial.println(F("DD_WINDOW: Window opening"));
       break;
 
     case 'a': // Down
-      ed_relay_off(ED_RELAY_ID_1);
-      ed_relay_on(ED_RELAY_ID_2);
+      ed_relay_off(ED_RELAY_WIN_POS_TERM_ID);
+      ed_relay_on(ED_RELAY_WIN_NEG_TERM_ID);
       Serial.println(F("ED_RELAY: Window Closing"));
       break;
 
@@ -62,25 +62,25 @@ void ed_relay_term_cmd(char cmd)
     case 'x': // manual or automat control
       Serial.println(F("DD_RELAY: STOP Command"));
       // toggle heater
-      if(ed_relay_getState(ED_RELAY_ID_3) == ED_RELAY_ON)
+      if(ed_relay_getState(ED_RELAY_HEAT_ID) == ED_RELAY_ON)
       {
-        ed_relay_off(ED_RELAY_ID_3);
+        ed_relay_off(ED_RELAY_HEAT_ID);
         Serial.println(F("ED_RELAY: Toggle Heater OFF"));
       }
       else
       {
-        ed_relay_on(ED_RELAY_ID_3);
+        ed_relay_on(ED_RELAY_HEAT_ID);
         Serial.println(F("ED_RELAY: Toggle Heater ON"));
       }
       break;
 
     case 'w': // UP
-      ed_relay_on(ED_RELAY_ID_3);
+      ed_relay_on(ED_RELAY_HEAT_ID);
       Serial.println(F("ED_RELAY: Heater ON"));
       break;
 
     case 's': // Down
-      ed_relay_off(ED_RELAY_ID_3);
+      ed_relay_off(ED_RELAY_HEAT_ID);
       Serial.println(F("ED_RELAY: Heater OFF"));
       break;
 
@@ -88,72 +88,72 @@ void ed_relay_term_cmd(char cmd)
     case 'c': // manual or automat control
       Serial.println(F("DD_RELAY: STOP Command"));
       // toggle humidityfier
-      if(ed_relay_getState(ED_RELAY_ID_3) == ED_RELAY_ON)
+      if(ed_relay_getState(ED_RELAY_HEAT_ID) == ED_RELAY_ON)
       {
-        ed_relay_off(ED_RELAY_ID_3);
+        ed_relay_off(ED_RELAY_HEAT_ID);
         Serial.println(F("ED_RELAY: Toggle Humidityfier OFF"));
       }
       else
       {
-        ed_relay_on(ED_RELAY_ID_3);
+        ed_relay_on(ED_RELAY_HEAT_ID);
         Serial.println(F("ED_RELAY: Toggle Humidityfier ON"));
       }
 
       break;
 
     case 'e': // UP
-      ed_relay_on(ED_RELAY_ID_4);
+      ed_relay_on(ED_RELAY_HUMIDIFY_ID);
       Serial.println(F("DD_VALVE: Valve opening"));
       break;
 
     case 'd': // Down
-      ed_relay_off(ED_RELAY_ID_4);
+      ed_relay_off(ED_RELAY_HUMIDIFY_ID);
       Serial.println(F("ED_RELAY: Valve Closing"));
       // moisture control
     case 'v': // manual or automat control
       Serial.println(F("DD_RELAY: STOP Command"));
-      ed_relay_off(ED_RELAY_ID_5);
+      ed_relay_off(ED_RELAY_MOIST_ID);
       break;
 
     case 'r': // UP
-      ed_relay_on(ED_RELAY_ID_5);
+      ed_relay_on(ED_RELAY_MOIST_ID);
       Serial.println(F("DD_VALVE: Valve opening"));
       break;
 
     case 'f': // Down
-      ed_relay_off(ED_RELAY_ID_5);
+      ed_relay_off(ED_RELAY_MOIST_ID);
       Serial.println(F("ED_RELAY: Valve Closing"));
       break;
 
     // air pressure control
     case 'b': // manual or automat control
       Serial.println(F("DD_RELAY: STOP Command"));
-      ed_relay_off(ED_RELAY_ID_6);
+      ed_relay_off(ED_RELAY_AIR_PUMP_ID);
       break;
 
     case 't': // UP
-      ed_relay_on(ED_RELAY_ID_6);
+      ed_relay_on(ED_RELAY_AIR_PUMP_ID);
       Serial.println(F("DD_RELAY: Air_pump ON"));
       break;
 
     case 'g': // Down
-      ed_relay_off(ED_RELAY_ID_6);
+      ed_relay_off(ED_RELAY_AIR_PUMP_ID);
       Serial.println(F("ED_RELAY: Air_press OFF"));
       break;
 
     // lights control
     case 'n': // manual or automat control
       Serial.println(F("DD_RELAY: STOP Command"));
-      ed_relay_off(ED_RELAY_ID_7);
+      ed_relay_off(ED_RELAY_LIGHTS_ID);
       break;
 
     case 'y': // UP
-      ed_relay_on(ED_RELAY_ID_7);
+      ed_relay_on(ED_RELAY_LIGHTS_ID);
       Serial.println(F("DD_LIGHTS: Lights ON"));
       break;
 
     case 'h': // Down
-      ed_relay_off(ED_RELAY_ID_7);
+      ed_relay_off(ED_RELAY_LIGHTS_ID);
       Serial.println(F("ED_RELAY: Lights OFF"));
       break;
 

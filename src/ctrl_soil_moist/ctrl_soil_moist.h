@@ -17,7 +17,7 @@
 #endif
 
 #ifndef CTRL_SOIL_MOIST_OP_D_TIME
-#define CTRL_SOIL_MOIST_OP_D_TIME 10
+#define CTRL_SOIL_MOIST_OP_D_TIME (1.0 * TIME_SEC)
 #endif
 
 #define CTRL_SOIL_MOIST_OUT_OFF 0

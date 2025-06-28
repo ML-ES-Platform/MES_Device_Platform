@@ -95,7 +95,7 @@ void ctrl_air_hum_term_cmd(char cmd)
     else
     {
       Serial.println(F("CTRL_AIR_HUM: Humidifier ON"));
-      dd_valve_on(DD_VALVE_ID_1, CTRL_AIR_HUM_OP_D_TIME);
+      dd_valve_on(DD_VALVE_AIR_HUM_ID, CTRL_AIR_HUM_OP_D_TIME);
     }
     break;
 
@@ -110,7 +110,7 @@ void ctrl_air_hum_term_cmd(char cmd)
     else
     {
       Serial.println(F("CTRL_AIR_HUM: Humidifier OFF"));
-      dd_valve_off(DD_VALVE_ID_1);
+      dd_valve_off(DD_VALVE_AIR_HUM_ID);
     }
     break;
 

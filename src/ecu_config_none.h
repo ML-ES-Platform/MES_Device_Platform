@@ -2,7 +2,7 @@
 #define ECU_CONFIG_NONE_H_
 
 // #define USE_SRV_SYS_OS_SEQ
-#define USE_SRV_OS_FREERTOS
+#define USE_SRV_SYS_OS_FREERTOS
 #define USE_SRV_UI_SERIAL
 
 

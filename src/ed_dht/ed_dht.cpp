@@ -26,7 +26,7 @@
 // See guide for details on sensor wiring and usage:
 //   https://learn.adafruit.com/dht/overview
 
-DHT_Unified dht(DHT_PIN, DHTTYPE);
+DHT_Unified dht(ED_DHT_PIN, DHTTYPE);
 
 uint32_t delayMS;
 

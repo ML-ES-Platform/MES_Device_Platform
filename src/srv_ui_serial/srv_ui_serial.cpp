@@ -10,11 +10,11 @@
 #endif
 //-----------------------------------------------
 // include Control components reports
-#ifdef USE_CTRL_TEMP_HEAT
-#include "ctrl_temp_heat/ctrl_temp_heat_term.h"
+#ifdef USE_CTRL_AIR_TEMP_HEAT
+#include "ctrl_air_temp_heat/ctrl_air_temp_heat_term.h"
 #endif
-#ifdef USE_CTRL_TEMP_VENT
-#include "ctrl_temp_vent/ctrl_temp_vent_term.h"
+#ifdef USE_CTRL_AIR_TEMP_VENT
+#include "ctrl_air_temp_vent/ctrl_air_temp_vent_term.h"
 #endif
 #ifdef USE_CTRL_AIR_HUM
 #include "ctrl_air_hum/ctrl_air_hum_term.h"
@@ -25,8 +25,8 @@
 #ifdef USE_CTRL_AIR_PRESS
 #include "ctrl_air_press/ctrl_air_press_term.h"
 #endif
-#ifdef USE_CTRL_LIGHTS
-#include "ctrl_lights/ctrl_lights_term.h"
+#ifdef USE_CTRL_AMB_LIGHT
+#include "ctrl_amb_light/ctrl_amb_light_term.h"
 #endif
 
 //-----------------------------------------------
@@ -92,16 +92,16 @@ void srv_ui_serial_setup()
 void srv_ui_serial_in_green_house(char cmd)
 {
 
-#if defined USE_CTRL_TEMP_VENT
-      ctrl_temp_vent_term_cmd(cmd);
+#if defined USE_CTRL_AIR_TEMP_VENT
+      ctrl_air_temp_vent_term_cmd(cmd);
 #elif defined USE_DD_WINDOW
       dd_window_term_cmd(cmd);
 #elif defined USE_ED_RELAY // 1,2
       ed_relay_term_cmd(cmd);
 #endif
 
-#if defined USE_CTRL_TEMP_HEAT
-      ctrl_temp_heat_term_cmd(cmd);
+#if defined USE_CTRL_AIR_TEMP_HEAT
+      ctrl_air_temp_heat_term_cmd(cmd);
 #elif defined USE_DD_HEATER
       dd_heater_term_cmd(cmd);
 #elif defined USE_ED_RELAY // 3
@@ -132,8 +132,8 @@ void srv_ui_serial_in_green_house(char cmd)
       ed_relay_term_cmd(cmd);
 #endif
 
-#if defined USE_CTRL_LIGHTS
-      ctrl_lights_term_cmd(cmd);
+#if defined USE_CTRL_AMB_LIGHT
+      ctrl_amb_light_term_cmd(cmd);
 #elif defined USE_DD_LIGHTS
       dd_lights_term_cmd(cmd);
 #elif defined USE_ED_RELAY // 7
@@ -166,11 +166,11 @@ void srv_ui_serial_out_loop()
 
 //-----------------------------------------------
 //  Report Control components state
-#ifdef USE_CTRL_TEMP_VENT
-      ctrl_temp_vent_report();
+#ifdef USE_CTRL_AIR_TEMP_VENT
+      ctrl_air_temp_vent_report();
 #endif
-#ifdef USE_CTRL_TEMP_HEAT
-      ctrl_temp_heat_report();
+#ifdef USE_CTRL_AIR_TEMP_HEAT
+      ctrl_air_temp_heat_report();
 #endif
 #ifdef USE_CTRL_AIR_HUM
       ctrl_air_hum_report();
@@ -181,8 +181,8 @@ void srv_ui_serial_out_loop()
 #ifdef USE_CTRL_AIR_PRESS
       ctrl_air_press_report();
 #endif
-#ifdef USE_CTRL_LIGHTS
-      ctrl_lights_report();
+#ifdef USE_CTRL_AMB_LIGHT
+      ctrl_amb_light_report();
 #endif
 
 //-----------------------------------------------

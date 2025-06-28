@@ -11,13 +11,13 @@
 #endif
 
 #ifndef DD_VALVE_OP_D_TIME
-#define DD_VALVE_OP_D_TIME (4 * TIME_SEC / DD_VALVE_REC)
+#define DD_VALVE_OP_D_TIME (1.0 * TIME_SEC)
 #endif
 
 
 enum dd_valve_t {
-    DD_VALVE_ID_1,
-    DD_VALVE_ID_2,
+    DD_VALVE_AIR_HUM_ID,
+    DD_VALVE_SOIL_MOIST_ID,
     DD_VALVE_NR_OF
 };
 

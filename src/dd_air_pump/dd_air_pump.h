@@ -14,7 +14,7 @@
 #endif
 
 #ifndef DD_AIR_PUMP_OP_D_TIME
-#define DD_AIR_PUMP_OP_D_TIME (1.0 * TIME_SEC / DD_AIR_PUMP_REC)
+#define DD_AIR_PUMP_OP_D_TIME (1.0 * TIME_SEC)
 #endif
 
 void dd_air_pump_setup();

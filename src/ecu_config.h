@@ -2,7 +2,6 @@
 #define ECU_CONFIG_H_
 
 #define SYS_TICK (10.0) // ms
-#define SRV_SNS_AIR_TEMP_OFFSET (1)
 
 #define TIME_mSEC 1
 #define TIME_SEC (1000 * TIME_mSEC)
@@ -17,12 +16,14 @@
 
 //------------------------------------------------
 // Greeenhouse configuration
-#define ECU_CTRL_TEMP_VENT 1
-#define ECU_CTRL_TEMP_HEAT 2
-#define ECU_CTRL_AIR_HUM 3
-#define ECU_CTRL_SOIL_MOIST 4
-#define ECU_CTRL_AIR_PRESS 5
-#define ECU_CTRL_LIGHT 6
+#define ECU_CTRL_GREEN_HOUSE  100
+#define ECU_CTRL_AIR_TEMP_VENT    101
+#define ECU_CTRL_AIR_TEMP_HEAT    102
+#define ECU_CTRL_AIR_HUM      103
+#define ECU_CTRL_SOIL_MOIST   104
+#define ECU_CTRL_AIR_PRESS    105
+#define ECU_CTRL_LIGHT        106
+
 
 
 
@@ -72,36 +73,40 @@
 
 //==============================================================================
 // Select configuration for ECU HERE !!
-#define ECU_CONFIG ECU_CTRL_TEMP_VENT  // <--- HERE
+#define ECU_CONFIG ECU_CTRL_GREEN_HOUSE  // <--- HERE
 //==============================================================================
 
 #if ECU_CONFIG == ECU_ALL
 
 #define USE_SRV_UI_SERIAL
 
-#elif ECU_CONFIG == ECU_CTRL_TEMP_VENT
+#elif ECU_CONFIG == ECU_CTRL_GREEN_HOUSE
 
-#include "ecu_config_ctrl_temp_vent.h"
+#include "ecu_config_green_house_ctrl.h"
 
-#elif ECU_CONFIG == ECU_CTRL_TEMP_HEAT
+#elif ECU_CONFIG == ECU_CTRL_AIR_TEMP_VENT
 
-#include "ecu_config_ctrl_temp_heat.h"
+#include "ecu_config_gh_ctrl_air_temp_vent.h"
+
+#elif ECU_CONFIG == ECU_CTRL_AIR_TEMP_HEAT
+
+#include "ecu_config_ctrl_air_temp_heat.h"
 
 #elif ECU_CONFIG == ECU_CTRL_LIGHT
 
-#include "ecu_config_ctrl_lights.h"
+#include "ecu_config_gh_ctrl_amb_light.h"
 
 #elif ECU_CONFIG == ECU_CTRL_AIR_PRESS
 
-#include "ecu_config_ctrl_air_press.h"
+#include "ecu_config_gh_ctrl_air_press.h"
 
 #elif ECU_CONFIG == ECU_CTRL_SOIL_MOIST
 
-#include "ecu_config_ctrl_soil_moist.h"
+#include "ecu_config_gh_ctrl_soil_moist.h"
 
 #elif ECU_CONFIG == ECU_CTRL_AIR_HUM
 
-#include "ecu_config_ctrl_air_hum.h"
+#include "ecu_config_gh_ctrl_air_hum.h"
 
 #elif ECU_CONFIG == ECU_CTRL_NONE
 

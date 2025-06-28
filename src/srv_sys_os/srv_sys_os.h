@@ -48,12 +48,12 @@
 #endif
 #endif
 //-----------------------------------------------------------------------------
-#ifdef USE_CTRL_LIGHTS
-#ifndef CTRL_LIGHTS_REC
-#define CTRL_LIGHTS_REC (10000 )
+#ifdef USE_CTRL_AMB_LIGHT
+#ifndef CTRL_AMB_LIGHT_REC
+#define CTRL_AMB_LIGHT_REC (10000 )
 #endif
-#ifndef CTRL_LIGHTS_OFFSET
-#define CTRL_LIGHTS_OFFSET (CTRL_LIGHTS_REC + 4)
+#ifndef CTRL_AMB_LIGHT_OFFSET
+#define CTRL_AMB_LIGHT_OFFSET (CTRL_AMB_LIGHT_REC + 4)
 #endif
 #endif
 //-----------------------------------------------------------------------------
@@ -75,21 +75,21 @@
 #endif
 #endif
 //-----------------------------------------------------------------------------
-#ifdef USE_CTRL_TEMP_HEAT
-#ifndef CTRL_TEMP_HEAT_REC
-#define CTRL_TEMP_HEAT_REC (10000 )
+#ifdef USE_CTRL_AIR_TEMP_HEAT
+#ifndef CTRL_AIR_TEMP_HEAT_REC
+#define CTRL_AIR_TEMP_HEAT_REC (10000 )
 #endif
-#ifndef CTRL_TEMP_HEAT_OFFSET
-#define CTRL_TEMP_HEAT_OFFSET (CTRL_TEMP_HEAT_REC + 3)
+#ifndef CTRL_AIR_TEMP_HEAT_OFFSET
+#define CTRL_AIR_TEMP_HEAT_OFFSET (CTRL_AIR_TEMP_HEAT_REC + 3)
 #endif
 #endif
 //-----------------------------------------------------------------------------
-#ifdef USE_CTRL_TEMP_VENT
-#ifndef CTRL_TEMP_VENT_REC
-#define CTRL_TEMP_VENT_REC (60 * TIME_SEC)
+#ifdef USE_CTRL_AIR_TEMP_VENT
+#ifndef CTRL_AIR_TEMP_VENT_REC
+#define CTRL_AIR_TEMP_VENT_REC (60 * TIME_SEC)
 #endif
-#ifndef CTRL_TEMP_VENT_OFFSET
-#define CTRL_TEMP_VENT_OFFSET (61 * TIME_SEC)
+#ifndef CTRL_AIR_TEMP_VENT_OFFSET
+#define CTRL_AIR_TEMP_VENT_OFFSET (61 * TIME_SEC)
 #endif
 #endif
 //-----------------------------------------------------------------------------

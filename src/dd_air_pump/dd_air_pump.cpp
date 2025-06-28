@@ -3,7 +3,7 @@
 #include "Arduino.h"
 
 int dd_air_pump_state = DD_AIR_PUMP_OFF;
-int dd_air_pump_relay = ED_RELAY_ID_6;
+int dd_air_pump_relay = ED_RELAY_AIR_PUMP_ID;
 
 int dd_air_pump_op_cnt = 0;
 
@@ -34,7 +34,7 @@ int dd_air_pump_off()
 int dd_air_pump_on(int time)
 {
     int state = dd_air_pump_set_state(DD_AIR_PUMP_ON);
-    dd_air_pump_op_cnt = time;
+    dd_air_pump_op_cnt = time/DD_AIR_PUMP_REC; // set operation count
     return state;
 }
 

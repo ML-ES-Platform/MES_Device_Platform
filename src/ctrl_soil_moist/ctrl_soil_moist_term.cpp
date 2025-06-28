@@ -96,7 +96,7 @@ void ctrl_soil_moist_term_cmd(char cmd)
       }
       else
       {
-        dd_valve_on(DD_VALVE_ID_2,CTRL_SOIL_MOIST_OP_D_TIME);
+        dd_valve_on(DD_VALVE_SOIL_MOIST_ID,CTRL_SOIL_MOIST_OP_D_TIME);
         Serial.println(F("CTRL_SOIL_MOIST: Valve opening"));
       }
       break;
@@ -111,7 +111,7 @@ void ctrl_soil_moist_term_cmd(char cmd)
       }
       else
       {
-        dd_valve_off(DD_VALVE_ID_2);
+        dd_valve_off(DD_VALVE_SOIL_MOIST_ID);
         Serial.println(F(" DD_VALVE: Valve Closing"));
       }
       break;

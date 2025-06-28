@@ -1,8 +1,8 @@
 #include "dd_window.h"
 #include "ed_relay/ed_relay.h"
 
-#define DD_WINDOW_ACT_POS_TERM ED_RELAY_ID_1
-#define DD_WINDOW_ACT_NEG_TERM ED_RELAY_ID_2
+#define DD_WINDOW_ACT_POS_TERM ED_RELAY_WIN_POS_TERM_ID
+#define DD_WINDOW_ACT_NEG_TERM ED_RELAY_WIN_NEG_TERM_ID
 
 int8_t dd_window_state = DD_WINDOW_STOP;
 int32_t dd_window_op_cnt = 0;
@@ -46,14 +46,14 @@ int8_t dd_window_stop()
 
 int8_t dd_window_open(int time)
 {
-    dd_window_op_cnt = time;
+    dd_window_op_cnt = time/DD_WINDOW_REC; // set operation count
     dd_window_state = DD_WINDOW_OPEN;
     return dd_window_state;
 }
 
 int8_t dd_window_close(int time)
 {
-    dd_window_op_cnt = time;
+    dd_window_op_cnt = time/DD_WINDOW_REC; // set operation count
     dd_window_state = DD_WINDOW_CLOSE;
     return dd_window_state;
 }

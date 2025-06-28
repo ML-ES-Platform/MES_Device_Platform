@@ -13,13 +13,13 @@
 #endif
 
 #ifndef DD_HEATER_OP_D_TIME
-#define DD_HEATER_OP_D_TIME (1.0 * TIME_SEC / DD_HEATER_REC)
+#define DD_HEATER_OP_D_TIME (1.0 * TIME_SEC)
 #endif
 
 void dd_heater_setup();
 void dd_heater_loop();
 
-int dd_heater_on( int time);
+int dd_heater_on(int time);
 int dd_heater_off();
 int dd_heater_get_state();
 int dd_heater_set_state (int state);

@@ -9,11 +9,11 @@
 // Control modules
 void ctrl_air_hum_task(void *pvParameters);
 void ctrl_air_press_task(void *pvParameters);
-void ctrl_lights_task(void *pvParameters);
+void ctrl_amb_light_task(void *pvParameters);
 void ctrl_servo_adc_dc_task(void *pvParameters);
 void ctrl_soil_moist_task(void *pvParameters);
-void ctrl_temp_heat_task(void *pvParameters);
-void ctrl_temp_vent_task(void *pvParameters);
+void ctrl_air_temp_heat_task(void *pvParameters);
+void ctrl_air_temp_vent_task(void *pvParameters);
 void ctrl_can_steer_task(void *pvParameters);
 void ctrl_wheel_steer_task(void *pvParameters);
 void ctrl_wheel_tract_task(void *pvParameters);
@@ -84,8 +84,8 @@ void srv_sys_os_freertos_setup()
     xTaskCreate(ctrl_air_press_task, "ctrl_air_press_task", 1024, NULL, 1, NULL);
 #endif
 //-----------------------------------------------------------------------------
-#ifdef USE_CTRL_LIGHTS
-    xTaskCreate(ctrl_lights_task, "ctrl_lights_task", 1024, NULL, 1, NULL);
+#ifdef USE_CTRL_AMB_LIGHT
+    xTaskCreate(ctrl_amb_light_task, "ctrl_amb_light_task", 1024, NULL, 1, NULL);
 #endif
 //-----------------------------------------------------------------------------
 #ifdef USE_CTRL_SERVO_ADC_DC
@@ -96,12 +96,12 @@ void srv_sys_os_freertos_setup()
     xTaskCreate(ctrl_soil_moist_task, "ctrl_soil_moist_task", 1024, NULL, 1, NULL);
 #endif
 //-----------------------------------------------------------------------------
-#ifdef USE_CTRL_TEMP_HEAT
-    xTaskCreate(ctrl_temp_heat_task, "ctrl_temp_heat_task", 1024, NULL, 1, NULL);
+#ifdef USE_CTRL_AIR_TEMP_HEAT
+    xTaskCreate(ctrl_air_temp_heat_task, "ctrl_air_temp_heat_task", 1024, NULL, 1, NULL);
 #endif
 //-----------------------------------------------------------------------------
-#ifdef USE_CTRL_TEMP_VENT
-    xTaskCreate(ctrl_temp_vent_task, "ctrl_temp_vent_task", 1024, NULL, 1, NULL);
+#ifdef USE_CTRL_AIR_TEMP_VENT
+    xTaskCreate(ctrl_air_temp_vent_task, "ctrl_air_temp_vent_task", 1024, NULL, 1, NULL);
 #endif
 //-----------------------------------------------------------------------------
 #ifdef USE_CTRL_CAN_STEER
@@ -308,17 +308,17 @@ void ctrl_air_press_task(void *pvParameters)
 
 //-----------------------------------------------------------------------------
 // Task for light control
-#ifdef USE_CTRL_LIGHTS
-void ctrl_lights_task(void *pvParameters)
+#ifdef USE_CTRL_AMB_LIGHT
+void ctrl_amb_light_task(void *pvParameters)
 {
-    ctrl_lights_setup();
-    vTaskDelay(CTRL_LIGHTS_OFFSET / portTICK_PERIOD_MS);
+    ctrl_amb_light_setup();
+    vTaskDelay(CTRL_AMB_LIGHT_OFFSET / portTICK_PERIOD_MS);
     TickType_t xLastWakeTime = xTaskGetTickCount();
 
     for (;;)
     {
-        ctrl_lights_loop();
-        vTaskDelayUntil(&xLastWakeTime, CTRL_LIGHTS_REC / portTICK_PERIOD_MS);
+        ctrl_amb_light_loop();
+        vTaskDelayUntil(&xLastWakeTime, CTRL_AMB_LIGHT_REC / portTICK_PERIOD_MS);
     }
 }
 #endif
@@ -358,33 +358,33 @@ void ctrl_soil_moist_task(void *pvParameters)
 
 //-----------------------------------------------------------------------------
 // Task for temperature control with heater
-#ifdef USE_CTRL_TEMP_HEAT
-void ctrl_temp_heat_task(void *pvParameters)
+#ifdef USE_CTRL_AIR_TEMP_HEAT
+void ctrl_air_temp_heat_task(void *pvParameters)
 {
-    ctrl_temp_heat_setup();
-    vTaskDelay(CTRL_TEMP_HEAT_OFFSET / portTICK_PERIOD_MS);
+    ctrl_air_temp_heat_setup();
+    vTaskDelay(CTRL_AIR_TEMP_HEAT_OFFSET / portTICK_PERIOD_MS);
     TickType_t xLastWakeTime = xTaskGetTickCount();
 
     for (;;)
     {
-        ctrl_temp_heat_loop();
-        vTaskDelayUntil(&xLastWakeTime, CTRL_TEMP_HEAT_REC / portTICK_PERIOD_MS);
+        ctrl_air_temp_heat_loop();
+        vTaskDelayUntil(&xLastWakeTime, CTRL_AIR_TEMP_HEAT_REC / portTICK_PERIOD_MS);
     }
 }
 #endif
 //-----------------------------------------------------------------------------
 // Task for temperature control with ventilation`
-#ifdef USE_CTRL_TEMP_VENT
-void ctrl_temp_vent_task(void *pvParameters)
+#ifdef USE_CTRL_AIR_TEMP_VENT
+void ctrl_air_temp_vent_task(void *pvParameters)
 {
-    ctrl_temp_vent_setup();
-    vTaskDelay(CTRL_TEMP_VENT_OFFSET / portTICK_PERIOD_MS);
+    ctrl_air_temp_vent_setup();
+    vTaskDelay(CTRL_AIR_TEMP_VENT_OFFSET / portTICK_PERIOD_MS);
     TickType_t xLastWakeTime = xTaskGetTickCount();
 
     for (;;)
     {
-        ctrl_temp_vent_loop();
-        vTaskDelayUntil(&xLastWakeTime, CTRL_TEMP_VENT_REC / portTICK_PERIOD_MS);
+        ctrl_air_temp_vent_loop();
+        vTaskDelayUntil(&xLastWakeTime, CTRL_AIR_TEMP_VENT_REC / portTICK_PERIOD_MS);
     }
 }
 #endif

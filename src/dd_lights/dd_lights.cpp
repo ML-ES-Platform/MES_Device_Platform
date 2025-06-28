@@ -3,7 +3,7 @@
 #include "Arduino.h"
 
 int dd_lights_state;
-int dd_lights_relay = ED_RELAY_ID_7;
+int dd_lights_relay = ED_RELAY_LIGHTS_ID;
 
 int dd_lights_op_cnt = 0;
 
@@ -34,7 +34,7 @@ int dd_lights_off()
 int dd_lights_on(int time)
 {
     int state = dd_lights_set_state( DD_LIGHTS_ON);
-    dd_lights_op_cnt = time;
+    dd_lights_op_cnt = time/DD_LIGHTS_REC; // set operation count
     return state;
 }
 

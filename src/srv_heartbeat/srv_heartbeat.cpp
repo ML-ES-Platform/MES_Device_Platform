@@ -15,7 +15,7 @@ void srv_heartbeat_loop()
     {
         srv_hearbeat_state = 0;
         digitalWrite(SRV_HEARTBEAT_LED_PIN, LOW);
-        Serial.print(F("Heartbeat !!"));
+        Serial.print(F("[ -- Heartbeat !! -- ]\n"));
     }
     else
     {

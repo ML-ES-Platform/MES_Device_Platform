@@ -14,14 +14,14 @@
 #endif
 
 #ifndef DD_LIGHTS_OP_D_TIME
-#define DD_LIGHTS_OP_D_TIME (4 * TIME_SEC / DD_LIGHTS_REC)
+#define DD_LIGHTS_OP_D_TIME (1.0 * TIME_SEC)
 #endif
 
 
 void dd_lights_setup();
 void dd_lights_loop();
 
-int dd_lights_on( int time);
+int dd_lights_on(int time);
 int dd_lights_off();
 int dd_lights_get_state();
 int dd_lights_set_state (int state);

@@ -16,8 +16,8 @@
 #include "ctrl_air_press/ctrl_air_press.h"
 #endif
 //-----------------------------------------------------------------------------
-#ifdef USE_CTRL_LIGHTS
-#include "ctrl_lights/ctrl_lights.h"
+#ifdef USE_CTRL_AMB_LIGHT
+#include "ctrl_amb_light/ctrl_amb_light.h"
 #endif
 //-----------------------------------------------------------------------------
 #ifdef USE_CTRL_SERVO_ADC_DC
@@ -28,12 +28,12 @@
 #include "ctrl_soil_moist/ctrl_soil_moist.h"
 #endif
 //-----------------------------------------------------------------------------
-#ifdef USE_CTRL_TEMP_HEAT
-#include "ctrl_temp_heat/ctrl_temp_heat.h"
+#ifdef USE_CTRL_AIR_TEMP_HEAT
+#include "ctrl_air_temp_heat/ctrl_air_temp_heat.h"
 #endif
 //-----------------------------------------------------------------------------
-#ifdef USE_CTRL_TEMP_VENT
-#include "ctrl_temp_vent/ctrl_temp_vent.h"
+#ifdef USE_CTRL_AIR_TEMP_VENT
+#include "ctrl_air_temp_vent/ctrl_air_temp_vent.h"
 #endif
 //-----------------------------------------------------------------------------
 #ifdef USE_CTRL_CAN_STEER
