@@ -2,7 +2,7 @@ import os
 import json
 
 from gen_utils import *
-
+global unit_id
 
 def gen_unit_head( base_dir, unit_name, config_json):
 
@@ -225,9 +225,10 @@ def gen_unit_mqtt_head( base_dir, unit_name, config_json):
 
     file.close()
 
-unit_id=100
 
 def gen_unit_mqtt_src( base_dir, unit_name, config_json):
+
+
 
     # Generate the file name based on the unit name
     # and the base directory
@@ -285,16 +286,22 @@ def gen_unit_mqtt_src( base_dir, unit_name, config_json):
     file.write("  // JSON mapping\n")
     file.write("  doc_out.clear();\n")
     file.write("  doc_out[\"device_id\"] = \"gh_001\";\n")
-    unit_id=unit_id + 1
+    #auto increment unit_id
+
+    global unit_id
+    if 'unit_id' not in globals():
+        unit_id = 100
+    unit_id += 1
     # unit_id = config_get_component_id(component_json, unit_id)
     file.write("  doc_out[\"unit_id\"] = "+str(unit_id)+";\n")
+    file.write("  doc_out[\"unit_name\"] = \""+unit_name+"\";\n")
     file.write("  doc_out[\"cur_hum\"] = "+unit_name+"_get_current_hum();\n")
     file.write("  doc_out[\"set_point\"] = "+unit_name+"_get_setpoint();\n")
     file.write("  doc_out[\"ctrl_mode\"] = "+unit_name+"_get_mode();\n")
     file.write("  doc_out[\"ctrl_out\"] = "+unit_name+"_get_output();\n")
     file.write("\n")
     file.write("  // Publishing data throgh MQTT\n")
-    file.write("  char mqtt_message[128];\n")
+    file.write("  char mqtt_message[256];\n")
     file.write("  serializeJson(doc_out, mqtt_message);\n")
     file.write("  mqttClient.publish("+char_variable_pub.lower()+", mqtt_message, true);\n")
     file.write("#endif\n")
@@ -418,6 +425,7 @@ def gen_units():
         # create mqtt communication src file
         gen_unit_mqtt_src(base_dir, subfolder, config_json)
 
-
+unit_id = 100
 gen_units()
+
 

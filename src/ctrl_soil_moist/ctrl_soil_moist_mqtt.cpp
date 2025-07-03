@@ -40,14 +40,15 @@ void ctrl_soil_moist_mqtt_publish(DynamicJsonDocument &doc_out, PubSubClient &mq
   // JSON mapping
   doc_out.clear();
   doc_out["device_id"] = "gh_001";
-  doc_out["unit_id"] = 444;
-  doc_out["cur_hum"] = ctrl_soil_moist_get_current_moist();
+  doc_out["unit_id"] = 109;
+  doc_out["unit_name"] = "ctrl_soil_moist";
+  doc_out["cur_moist"] = ctrl_soil_moist_get_current_moist();
   doc_out["set_point"] = ctrl_soil_moist_get_setpoint();
   doc_out["ctrl_mode"] = ctrl_soil_moist_get_mode();
   doc_out["ctrl_out"] = ctrl_soil_moist_get_output();
 
   // Publishing data throgh MQTT
-  char mqtt_message[128];
+  char mqtt_message[256];
   serializeJson(doc_out, mqtt_message);
   mqttClient.publish(ctrl_soil_moist_mqtt_publish_topic, mqtt_message, true);
 #endif

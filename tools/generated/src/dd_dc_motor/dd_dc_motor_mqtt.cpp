@@ -40,14 +40,15 @@ void dd_dc_motor_mqtt_publish(DynamicJsonDocument &doc_out, PubSubClient &mqttCl
   // JSON mapping
   doc_out.clear();
   doc_out["device_id"] = "gh_001";
-  doc_out["unit_id"] = 111;
+  doc_out["unit_id"] = 113;
+  doc_out["unit_name"] = "dd_dc_motor";
   doc_out["cur_hum"] = dd_dc_motor_get_current_hum();
   doc_out["set_point"] = dd_dc_motor_get_setpoint();
   doc_out["ctrl_mode"] = dd_dc_motor_get_mode();
   doc_out["ctrl_out"] = dd_dc_motor_get_output();
 
   // Publishing data throgh MQTT
-  char mqtt_message[128];
+  char mqtt_message[256];
   serializeJson(doc_out, mqtt_message);
   mqttClient.publish(dd_dc_motor_mqtt_publish_topic, mqtt_message, true);
 #endif

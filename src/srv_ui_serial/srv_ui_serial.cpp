@@ -141,8 +141,11 @@ void srv_ui_serial_in_green_house(char cmd)
 #endif
 }
 
+//-----------------------------------------------
+// process command for CAN bus
 void srv_ui_serial_in_can_steer(char cmd)
 {
+      // TODO: Implement CAN steering command processing
 }
 
 void srv_ui_serial_in_loop()
@@ -160,6 +163,8 @@ void srv_ui_serial_in_loop()
       }
 }
 
+//-----------------------------------------------
+// report system state
 void srv_ui_serial_out_loop()
 {
       Serial.println(F("=============== MLP: System Report =============== "));

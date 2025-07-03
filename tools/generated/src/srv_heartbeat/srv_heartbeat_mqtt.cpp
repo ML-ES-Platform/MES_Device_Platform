@@ -40,14 +40,15 @@ void srv_heartbeat_mqtt_publish(DynamicJsonDocument &doc_out, PubSubClient &mqtt
   // JSON mapping
   doc_out.clear();
   doc_out["device_id"] = "gh_001";
-  doc_out["unit_id"] = 111;
+  doc_out["unit_id"] = 137;
+  doc_out["unit_name"] = "srv_heartbeat";
   doc_out["cur_hum"] = srv_heartbeat_get_current_hum();
   doc_out["set_point"] = srv_heartbeat_get_setpoint();
   doc_out["ctrl_mode"] = srv_heartbeat_get_mode();
   doc_out["ctrl_out"] = srv_heartbeat_get_output();
 
   // Publishing data throgh MQTT
-  char mqtt_message[128];
+  char mqtt_message[256];
   serializeJson(doc_out, mqtt_message);
   mqttClient.publish(srv_heartbeat_mqtt_publish_topic, mqtt_message, true);
 #endif

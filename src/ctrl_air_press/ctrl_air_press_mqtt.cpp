@@ -40,14 +40,15 @@ void ctrl_air_press_mqtt_publish(DynamicJsonDocument &doc_out, PubSubClient &mqt
   // JSON mapping
   doc_out.clear();
   doc_out["device_id"] = "gh_001";
-  doc_out["unit_id"] = 111;
+  doc_out["unit_id"] = 103;
+  doc_out["unit_name"] = "ctrl_air_press";
   doc_out["cur_press"] = ctrl_air_press_get_current_press();
   doc_out["set_point"] = ctrl_air_press_get_setpoint();
   doc_out["ctrl_mode"] = ctrl_air_press_get_mode();
   doc_out["ctrl_out"] = ctrl_air_press_get_output();
 
   // Publishing data throgh MQTT
-  char mqtt_message[128];
+  char mqtt_message[256];
   serializeJson(doc_out, mqtt_message);
   mqttClient.publish(ctrl_air_press_mqtt_publish_topic, mqtt_message, true);
 #endif

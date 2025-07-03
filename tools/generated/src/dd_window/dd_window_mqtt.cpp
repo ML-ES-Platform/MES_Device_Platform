@@ -40,14 +40,15 @@ void dd_window_mqtt_publish(DynamicJsonDocument &doc_out, PubSubClient &mqttClie
   // JSON mapping
   doc_out.clear();
   doc_out["device_id"] = "gh_001";
-  doc_out["unit_id"] = 111;
+  doc_out["unit_id"] = 119;
+  doc_out["unit_name"] = "dd_window";
   doc_out["cur_hum"] = dd_window_get_current_hum();
   doc_out["set_point"] = dd_window_get_setpoint();
   doc_out["ctrl_mode"] = dd_window_get_mode();
   doc_out["ctrl_out"] = dd_window_get_output();
 
   // Publishing data throgh MQTT
-  char mqtt_message[128];
+  char mqtt_message[256];
   serializeJson(doc_out, mqtt_message);
   mqttClient.publish(dd_window_mqtt_publish_topic, mqtt_message, true);
 #endif

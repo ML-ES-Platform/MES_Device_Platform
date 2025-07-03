@@ -40,14 +40,15 @@ void ed_l298_mqtt_publish(DynamicJsonDocument &doc_out, PubSubClient &mqttClient
   // JSON mapping
   doc_out.clear();
   doc_out["device_id"] = "gh_001";
-  doc_out["unit_id"] = 111;
+  doc_out["unit_id"] = 128;
+  doc_out["unit_name"] = "ed_l298";
   doc_out["cur_hum"] = ed_l298_get_current_hum();
   doc_out["set_point"] = ed_l298_get_setpoint();
   doc_out["ctrl_mode"] = ed_l298_get_mode();
   doc_out["ctrl_out"] = ed_l298_get_output();
 
   // Publishing data throgh MQTT
-  char mqtt_message[128];
+  char mqtt_message[256];
   serializeJson(doc_out, mqtt_message);
   mqttClient.publish(ed_l298_mqtt_publish_topic, mqtt_message, true);
 #endif

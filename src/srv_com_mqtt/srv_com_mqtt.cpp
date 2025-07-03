@@ -168,7 +168,6 @@ void callback(char *topic, byte *payload, unsigned int length)
   ctrl_soil_moist_mqtt_callback(doc_in, topic, payload, length);
 #endif
 
-  Serial.println();
 }
 
 void reconnect()
@@ -210,12 +209,9 @@ void reconnect()
   }
 }
 
-//==========================================================
-// MQTT Callbacks
-//==========================================================
-
-// 
-
+//======================================================================
+// MQTT setup function
+//----------------------------------------------------------------------
 void srv_com_mqtt_setup()
 {
   // put your setup code here, to run once:
@@ -226,6 +222,9 @@ void srv_com_mqtt_setup()
 }
 
 
+//=============================================================================
+// MQTT loop function
+//-----------------------------------------------------------------------------
 void srv_com_mqtt_loop()
 {
   // put your main code here, to run repeatedly:

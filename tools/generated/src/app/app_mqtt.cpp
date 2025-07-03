@@ -40,14 +40,15 @@ void app_mqtt_publish(DynamicJsonDocument &doc_out, PubSubClient &mqttClient)
   // JSON mapping
   doc_out.clear();
   doc_out["device_id"] = "gh_001";
-  doc_out["unit_id"] = 111;
+  doc_out["unit_id"] = 101;
+  doc_out["unit_name"] = "app";
   doc_out["cur_hum"] = app_get_current_hum();
   doc_out["set_point"] = app_get_setpoint();
   doc_out["ctrl_mode"] = app_get_mode();
   doc_out["ctrl_out"] = app_get_output();
 
   // Publishing data throgh MQTT
-  char mqtt_message[128];
+  char mqtt_message[256];
   serializeJson(doc_out, mqtt_message);
   mqttClient.publish(app_mqtt_publish_topic, mqtt_message, true);
 #endif

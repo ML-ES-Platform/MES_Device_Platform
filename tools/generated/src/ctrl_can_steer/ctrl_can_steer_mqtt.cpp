@@ -40,14 +40,15 @@ void ctrl_can_steer_mqtt_publish(DynamicJsonDocument &doc_out, PubSubClient &mqt
   // JSON mapping
   doc_out.clear();
   doc_out["device_id"] = "gh_001";
-  doc_out["unit_id"] = 111;
+  doc_out["unit_id"] = 107;
+  doc_out["unit_name"] = "ctrl_can_steer";
   doc_out["cur_hum"] = ctrl_can_steer_get_current_hum();
   doc_out["set_point"] = ctrl_can_steer_get_setpoint();
   doc_out["ctrl_mode"] = ctrl_can_steer_get_mode();
   doc_out["ctrl_out"] = ctrl_can_steer_get_output();
 
   // Publishing data throgh MQTT
-  char mqtt_message[128];
+  char mqtt_message[256];
   serializeJson(doc_out, mqtt_message);
   mqttClient.publish(ctrl_can_steer_mqtt_publish_topic, mqtt_message, true);
 #endif
