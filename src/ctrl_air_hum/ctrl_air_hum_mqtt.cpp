@@ -1,95 +1,135 @@
-// #include "ctrl_air_hum_term.h"
-// #include "ctrl_air_hum.h"
-// #include "dd_valve/dd_valve.h"
-// #include "Arduino.h"
+#include "ctrl_air_hum_mqtt.h"
+#include "ctrl_air_hum.h"
+#include "dd_valve/dd_valve.h"
+#include "Arduino.h"
 
+char ctrl_air_hum_mqtt_subscribe_topic[] = CTRL_AIR_HUM_MQTT_SUBSCRIBE_TOPIC;
+char ctrl_air_hum_mqtt_publish_topic[] = CTRL_AIR_HUM_MQTT_PUBLISH_TOPIC;
 
-// //----------------------------------------------------------
-// // Publish Air Humidity Control Data to MQTT
-// void ctrl_air_hum_mqtt_publish()
-// {
-// #ifdef USE_CTRL_AIR_HUM
-//   float air_hum_ctrl_cur_hum = ctrl_air_hum_get_current_hum();
-//   float air_hum_ctrl_sp = ctrl_air_hum_get_setpoint();
-//   int air_hum_ctrl_mode = ctrl_air_hum_get_mode();
-//   int air_hum_out = ctrl_air_hum_get_output();
-//   // JSON mapping
-//   doc.clear();
-//   doc["sensor_id"] = 333;
-//   doc["cur_hum"] = air_hum_ctrl_cur_hum;
-//   doc["set_point"] = air_hum_ctrl_sp;
-//   doc["ctrl_mode"] = air_hum_ctrl_mode;
-//   doc["ctrl_out"] = air_hum_out;
+//----------------------------------------------------------
+// Subscribe to Air Humidity Control MQTT topic
+void ctrl_air_hum_mqtt_subscribe(PubSubClient &mqttClient)
+{
 
-//   // Publishing data throgh MQTT
-//   char mqtt_message[128];
-//   serializeJson(doc, mqtt_message);
-//   mqttClient.publish("microlab/agro/green_house/air_hum_ctrl", mqtt_message, true);
-// #endif
-// }
+#ifdef USE_CTRL_AIR_HUM
 
-// //----------------------------------------------------------
-// // Air Humidity Control MQTT Callback
-// void ctrl_air_hum_mqtt_callback(char *topic, byte *payload, unsigned int length)
-// {
-//   #ifdef USE_CTRL_AIR_HUM
+  Serial.println(F("CTRL_AIR_HUM_MQTT: ctrl_air_hum_mqtt_subscribe"));
 
-//   Serial.println();
+  if (mqttClient.subscribe(ctrl_air_hum_mqtt_subscribe_topic))
+  {
+    Serial.print(F("CTRL_AIR_HUM_MQTT: Subscribed to: "));
+    Serial.println(ctrl_air_hum_mqtt_subscribe_topic);
+  }
+  else
+  {
+    Serial.print(F("CTRL_AIR_HUM_MQTT: Failed to subscribe to: "));
+    Serial.println(ctrl_air_hum_mqtt_subscribe_topic);
+  }
+#endif
+}
 
-//   Serial.println(F("SRV_COM_MQTT: ctrl_air_hum_mqtt_callback"));
+//----------------------------------------------------------
+// Publish Air Humidity Control Data to MQTT
+void ctrl_air_hum_mqtt_publish(DynamicJsonDocument &doc_out, PubSubClient &mqttClient)
+{
 
-//   deserializeJson(doc_in, (const byte *)payload, length);
+#ifdef USE_CTRL_AIR_HUM
 
-//   char cmd[32];
-//   strlcpy(cmd, doc_in["cmd"] | "default", sizeof(cmd));
+  Serial.println(F("CTRL_AIR_HUM_MQTT: ctrl_air_hum_mqtt_publish"));
 
-//   Serial.print(F("Command:"));
-//   Serial.println(cmd);
+  // JSON mapping
+  doc_out.clear();
+  doc_out["device_id"] = "gh_001";
+  doc_out["unit_id"] = 111;
+  doc_out["cur_hum"] = ctrl_air_hum_get_current_hum();
+  doc_out["set_point"] = ctrl_air_hum_get_setpoint();
+  doc_out["ctrl_mode"] = ctrl_air_hum_get_mode();
+  doc_out["ctrl_out"] = ctrl_air_hum_get_output();
 
-//   char value[32];
-//   strlcpy(value, doc_in["value"] | "default", sizeof(value));
+  // Publishing data throgh MQTT
+  char mqtt_message[128];
+  serializeJson(doc_out, mqtt_message);
+  mqttClient.publish(ctrl_air_hum_mqtt_publish_topic, mqtt_message, true);
+#endif
+}
 
-//   Serial.print(F("Value:"));
-//   Serial.println(value);
+//----------------------------------------------------------
+// Air Humidity Control MQTT Callback
+int ctrl_air_hum_mqtt_callback(DynamicJsonDocument &doc_in, char *topic, byte *payload, unsigned int length)
+{
+  int result = 0; // default return value
+#ifdef USE_CTRL_AIR_HUM
 
-//   float value_f = atof(value);
-//   Serial.print(F("Value_f:"));
-//   Serial.println(value_f);
+  Serial.println();
 
-//   // subscribe message example
-//   // {
-//   // "cmd":"set_point",
-//   // "value":"17.3"
-//   // }
+  // check if the topic is the one we subscribed to
+  if (strcmp(topic, ctrl_air_hum_mqtt_subscribe_topic) == 0)
+  {
+    result = 1; // set result to 1 if the topic matches
 
+    // Serial.println(F("CTRL_AIR_HUM_MQTT: ctrl_air_hum_mqtt_callback"));
+    // Serial.print(F("CTRL_AIR_HUM_MQTT: Received message on topic: "));
+    // Serial.println(topic);
 
-//   if (strcmp(cmd, "set_point") == 0)
-//   {
-//     ctrl_air_hum_set_setpoint(value_f);
-//   }
-//   else if (strcmp(cmd, "ctrl_mode") == 0)
-//   {
-//     int mode = value_f;
-//     if (mode == CTRL_AIR_HUM_DISABLE)
-//     {
-//       ctrl_air_hum_set_mode_manual();
-//     }
-//     else if (mode == CTRL_AIR_HUM_ENABLE)
-//     {
-//       ctrl_air_hum_set_mode_auto();
-//     }
-//   }
-//   else if (strcmp(cmd, "ctrl_out") == 0)
-//   {
-//     int out = value_f;
-//     if (out == CTRL_AIR_HUM_OUT_OFF)
-//     {
-//       dd_valve_off();
-//     }
-//     else if (out == CTRL_AIR_HUM_OUT_ON)
-//     {
-//       dd_valve_on(CTRL_AIR_HUM_OP_D_TIME);
-//     }
-//   }
-//   #endif
-// }
+    deserializeJson(doc_in, (const byte *)payload, length);
+
+    char cmd[32];
+    strlcpy(cmd, doc_in["cmd"] | "default", sizeof(cmd));
+
+    Serial.print(F("Command:"));
+    Serial.println(cmd);
+
+    char value[32];
+    strlcpy(value, doc_in["value"] | "default", sizeof(value));
+
+    Serial.print(F("Value:"));
+    Serial.println(value);
+
+    float value_f = atof(value);
+    Serial.print(F("Value_f:"));
+    Serial.println(value_f);
+
+    // subscribe message example
+    // {
+    // "cmd":"set_point",
+    // "value":"17.3"
+    // }
+
+    if (strcmp(cmd, "set_point") == 0)
+    {
+      ctrl_air_hum_set_setpoint(value_f);
+    }
+    else if (strcmp(cmd, "ctrl_mode") == 0)
+    {
+      int mode = value_f;
+      if (mode == CTRL_AIR_HUM_DISABLE)
+      {
+        ctrl_air_hum_set_mode_manual();
+      }
+      else if (mode == CTRL_AIR_HUM_ENABLE)
+      {
+        ctrl_air_hum_set_mode_auto();
+      }
+    }
+    else if (strcmp(cmd, "ctrl_out") == 0)
+    {
+      int out = value_f;
+      if (out == CTRL_AIR_HUM_OUT_OFF)
+      {
+        dd_valve_off(DD_VALVE_AIR_HUM_ID);
+      }
+      else if (out == CTRL_AIR_HUM_OUT_ON)
+      {
+        dd_valve_on(DD_VALVE_AIR_HUM_ID, CTRL_AIR_HUM_OP_D_TIME);
+      }
+    }
+  }
+  else
+  {
+    result = 0; // set result to 0 if the topic does not match
+    // Serial.print(F("CTRL_AIR_HUM_MQTT: Received message on unknown topic: "));
+    // Serial.println(topic);
+  }
+#endif
+  return result; // return 1 if the topic matches, otherwise return 0
+}

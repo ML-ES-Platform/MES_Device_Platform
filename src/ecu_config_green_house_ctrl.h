@@ -176,11 +176,11 @@
 
 #define ED_RELAY_1_PIN 32
 #define ED_RELAY_2_PIN 33
-#define ED_RELAY_3_PIN 33
-#define ED_RELAY_4_PIN 33
-#define ED_RELAY_5_PIN 33
-#define ED_RELAY_6_PIN 33
-#define ED_RELAY_7_PIN 33 
+#define ED_RELAY_3_PIN 25
+#define ED_RELAY_4_PIN 26
+#define ED_RELAY_5_PIN 27
+#define ED_RELAY_6_PIN 14
+#define ED_RELAY_7_PIN 12
 
 
 #endif

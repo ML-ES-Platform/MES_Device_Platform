@@ -9,12 +9,14 @@
 // Control modules
 void ctrl_air_hum_task(void *pvParameters);
 void ctrl_air_press_task(void *pvParameters);
-void ctrl_amb_light_task(void *pvParameters);
-void ctrl_servo_adc_dc_task(void *pvParameters);
-void ctrl_soil_moist_task(void *pvParameters);
 void ctrl_air_temp_heat_task(void *pvParameters);
 void ctrl_air_temp_vent_task(void *pvParameters);
+void ctrl_amb_light_task(void *pvParameters);
 void ctrl_can_steer_task(void *pvParameters);
+void ctrl_servo_adc_dc_task(void *pvParameters);
+void ctrl_soil_moist_task(void *pvParameters);
+
+
 void ctrl_wheel_steer_task(void *pvParameters);
 void ctrl_wheel_tract_task(void *pvParameters);
 

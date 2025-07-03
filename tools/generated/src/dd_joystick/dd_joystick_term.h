@@ -1,0 +1,12 @@
+#ifndef DD_JOYSTICK_TERM_H
+#define DD_JOYSTICK_TERM_H
+
+// Include any necessary libraries or headers
+#include "ecu_config.h"
+
+// Define any constants or macros
+
+// Declare any function prototypes
+void dd_joystick_report();
+
+#endif // DD_JOYSTICK_TERM_H
